@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+</head><body>
+<title>Cahier de français</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: a French school notebook (cahier Seyès) — red margin line, violet ink, one column of activity cards */
+:root{
+  --paper:#fbfaf7; --line:#d9dcef; --line-strong:#b9bfe3; --margin:#e0525a;
+  --ink:#2b2350; --ink-soft:#5f5a7a; --violet:#5b3fb8; --violet-soft:#ece7fb;
+  --ok:#1f7a4d; --ok-bg:#e3f4ea; --ko:#b3323a; --ko-bg:#fbe6e7;
+  --masc:#2a63b8; --fem:#c0447a; --card:#ffffff; --shadow:0 1px 2px rgba(43,35,80,.08),0 4px 14px rgba(43,35,80,.06);
+  --f-display:"Caveat","Segoe Print","Comic Sans MS",cursive;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#17152a; --line:#25223f; --line-strong:#353160; --margin:#e8707a;
+  --ink:#ece9fb; --ink-soft:#aaa5c8; --violet:#b4a1ff; --violet-soft:#2a2550;
+  --ok:#6fd49d; --ok-bg:#183626; --ko:#ff8f97; --ko-bg:#3e1d22;
+  --masc:#7fb0ff; --fem:#ff8fbf; --card:#1f1c36; --shadow:0 1px 2px rgba(0,0,0,.3);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#17152a; --line:#25223f; --line-strong:#353160; --margin:#e8707a;
+  --ink:#ece9fb; --ink-soft:#aaa5c8; --violet:#b4a1ff; --violet-soft:#2a2550;
+  --ok:#6fd49d; --ok-bg:#183626; --ko:#ff8f97; --ko-bg:#3e1d22;
+  --masc:#7fb0ff; --fem:#ff8fbf; --card:#1f1c36; --shadow:0 1px 2px rgba(0,0,0,.3);
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--line) 31px 32px);}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;position:relative}
+.wrap::before{content:"";position:absolute;left:4px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.55}
+header{padding-left:14px}
+h1{font-family:var(--f-display);font-size:clamp(2.4rem,7vw,3.4rem);line-height:1;margin:0;color:var(--violet);text-wrap:balance}
+.sub{margin:.35rem 0 0;color:var(--ink-soft)}
+nav.themes{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 10px;padding-left:14px}
+nav.themes button,.acts button{font:inherit;border:1.5px solid var(--line-strong);background:var(--card);color:var(--ink);
+  padding:.45rem .85rem;border-radius:999px;cursor:pointer}
+nav.themes button[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:var(--paper);font-weight:700}
+.acts{display:flex;flex-wrap:wrap;gap:6px;padding-left:14px;margin-bottom:14px}
+.acts button{font-size:.9rem;padding:.3rem .7rem;border-radius:8px}
+.acts button[aria-pressed="true"]{background:var(--violet-soft);border-color:var(--violet);color:var(--violet);font-weight:700}
+button:focus-visible,input:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.stage{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:22px 18px;margin-left:14px;min-height:300px}
+.label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:0 0 6px}
+.prompt{font-family:var(--f-display);font-size:clamp(2.2rem,8vw,3.2rem);line-height:1.1;margin:4px 0 14px;text-align:center;overflow-wrap:anywhere}
+.prompt.small{font-family:var(--f-body);font-size:1.4rem;font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+@media (max-width:420px){.opts{grid-template-columns:1fr}}
+.opt{font:inherit;font-size:1.05rem;text-align:center;padding:.8rem .6rem;border-radius:10px;border:1.5px solid var(--line-strong);
+  background:var(--paper);color:var(--ink);cursor:pointer;min-width:0;overflow-wrap:anywhere}
+.opt:hover:not(:disabled){border-color:var(--violet)}
+.opt.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:700}
+.opt.ko{background:var(--ko-bg);border-color:var(--ko);color:var(--ko)}
+.btn{font:inherit;font-weight:700;padding:.6rem 1.1rem;border-radius:10px;border:0;background:var(--violet);color:var(--paper);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--violet);border:1.5px solid var(--violet)}
+.speak{font:inherit;display:inline-flex;align-items:center;gap:6px;padding:.5rem .9rem;border-radius:999px;border:1.5px solid var(--violet);
+  background:var(--violet-soft);color:var(--violet);font-weight:700;cursor:pointer}
+.speak svg{width:18px;height:18px}
+.big-speak{font-size:1.2rem;padding:1rem 1.6rem}
+.flash{perspective:900px;margin:6px auto 16px;max-width:420px}
+.flash-inner{border:1.5px dashed var(--line-strong);border-radius:12px;padding:26px 14px;text-align:center;cursor:pointer;background:
+  repeating-linear-gradient(to bottom,transparent 0 23px,var(--line) 23px 24px);min-height:150px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flash-inner .fr{font-family:var(--f-display);font-size:2.6rem;line-height:1.05;overflow-wrap:anywhere}
+.flash-inner .ca{font-size:1.15rem;color:var(--ink-soft)}
+.flash-inner .hint{font-size:.8rem;color:var(--ink-soft)}
+.feedback{min-height:1.6em;text-align:center;margin-top:12px;font-weight:700}
+.feedback.ok{color:var(--ok)} .feedback.ko{color:var(--ko)}
+input.answer{font:inherit;font-size:1.3rem;width:100%;max-width:420px;padding:.6rem .8rem;border-radius:10px;border:1.5px solid var(--line-strong);
+  background:var(--paper);color:var(--ink);text-align:center}
+.accents{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+.accents button{font:inherit;min-width:36px;padding:.25rem .5rem;border-radius:6px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);cursor:pointer}
+.score{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.9rem;color:var(--ink-soft);margin-bottom:12px;font-variant-numeric:tabular-nums}
+.score b{color:var(--ink)}
+.gender{display:flex;gap:12px;justify-content:center;margin-top:8px}
+.gender .opt{min-width:120px;font-family:var(--f-display);font-size:2rem;padding:.4rem 1rem}
+.gender .opt[data-g="m"]{color:var(--masc)} .gender .opt[data-g="f"]{color:var(--fem)}
+.gender .opt.ok,.gender .opt.ko{color:inherit}
+.tag{font-size:.75rem;font-weight:700;padding:.1rem .45rem;border-radius:999px;border:1px solid currentColor}
+.tag.m{color:var(--masc)} .tag.f{color:var(--fem)}
+.tip{margin:16px 0 0 14px;color:var(--ink-soft);font-size:.9rem;max-width:65ch}
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.match .col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.match .opt.sel{border-color:var(--violet);background:var(--violet-soft)}
+.match .opt.done{opacity:.45;background:var(--ok-bg);border-color:var(--ok);cursor:default}
+.vocab{width:100%;border-collapse:collapse;font-size:.95rem}
+.vocab td{padding:.45rem .4rem;border-bottom:1px solid var(--line)}
+.vocab td:first-child{font-weight:700}
+.vocab button{background:none;border:0;color:var(--violet);cursor:pointer;padding:4px}
+.tablewrap{overflow-x:auto}
+@media (prefers-reduced-motion:no-preference){.opt,.btn,.flash-inner{transition:background .15s,border-color .15s,transform .15s}.opt:active{transform:scale(.98)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Cahier de français</h1>
+    <p class="sub">Nombres, ordinals, objectes de la classe i de casa, mesos, dies de la setmana i salutacions. Toca 🔊 per escoltar la pronúncia.</p>
+  </header>
+
+  <nav class="themes" id="themes" aria-label="Temes"></nav>
+  <div class="acts" id="rooms" aria-label="Estances de la casa" hidden></div>
+  <div class="acts" id="acts" role="tablist" aria-label="Activitats"></div>
+  <section class="stage" id="stage" aria-live="polite"></section>
+  <p class="tip" id="tip"></p>
+</div>
+
+<script>
+const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+
+/* French numbers 0 – 1 000 000 (traditional spelling) */
+const U=["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize"];
+const TENS={2:"vingt",3:"trente",4:"quarante",5:"cinquante",6:"soixante"};
+function b100(n,fin){if(n<17)return U[n];if(n<20)return "dix-"+U[n-10];const t=Math.floor(n/10),r=n%10;
+  if(t<7)return TENS[t]+(r===0?"":r===1?" et un":"-"+U[r]);
+  if(t===7)return "soixante"+(r===1?" et onze":"-"+b100(10+r));
+  if(t===8)return r===0?(fin?"quatre-vingts":"quatre-vingt"):"quatre-vingt-"+U[r];
+  return "quatre-vingt-"+b100(10+r)}
+function b1000(n,fin){const h=Math.floor(n/100),r=n%100;if(!h)return b100(r,fin);
+  const hs=h===1?"cent":U[h]+" cent";if(!r)return h>1&&fin?hs+"s":hs;return hs+" "+b100(r,fin)}
+function frNum(n){if(n===0)return "zéro";if(n===1e6)return "un million";const th=Math.floor(n/1000),r=n%1000;
+  const ts=!th?"":th===1?"mille":b1000(th,false)+" mille";return [ts,r?b1000(r,true):""].filter(Boolean).join(" ")}
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ");
+function numItem(n){return {fr:frNum(n),ca:fmt(n),n}}
+function randNum(){const k=rnd(4);return k===0?rnd(101):k===1?100+rnd(900):k===2?1000+rnd(99000):rnd(4)?1000*(1+rnd(999)):(rnd(10)?100000+rnd(900000):1000000)}
+function nearNums(n,count){const set=new Set([n]),mag=n<20?3:n<100?10:n<1000?100:n<100000?1000:100000;let g=0;
+  while(set.size<count+1&&g++<200){const c=n+(rnd(2)?1:-1)*(1+rnd(4))*(rnd(3)?mag:Math.max(1,mag/10));if(c>=0&&c<=1e6)set.add(c)}
+  while(set.size<count+1)set.add(rnd(1001));set.delete(n);return [...set].slice(0,count)}
+/* question pickers: numbers mix the fixed list with random numbers up to a million */
+function pick(){if(theme==="nombres"&&rnd(2))return numItem(randNum());return items()[rnd(items().length)]}
+function distract(it){if(theme==="nombres")return nearNums(it.n,3).map(numItem);return shuffle(items().filter(x=>x.fr!==it.fr)).slice(0,3)}
+
+const THEMES={
+  nombres:{name:"Les nombres",tip:"70 = soixante-dix (60+10), 80 = quatre-vingts (4×20), 90 = quatre-vingt-dix. Cent i vingt només porten -s quan són múltiples i van al final: deux cents, però deux cent un i deux cent mille. Mille no porta mai -s. Un million.",
+    items:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,30,31,40,50,60,70,71,72,80,81,90,91,99,100,101,200,250,300,500,999,
+      1000,1001,2000,2026,5000,10000,21000,80000,100000,200000,500000,999999,1000000].map(numItem)},
+  ordinaux:{name:"Els ordinals",tip:"Es formen afegint -ième al número: deux → deuxième. Excepcions: premier / première, cinquième (amb u), neuvième (f → v).",
+    items:[["premier / première","1r / 1a — primer/a","1er"],["deuxième","2n — segon","2e"],["troisième","3r — tercer","3e"],["quatrième","4t — quart","4e"],
+      ["cinquième","5è — cinquè","5e"],["sixième","6è — sisè","6e"],["septième","7è — setè","7e"],["huitième","8è — vuitè","8e"],
+      ["neuvième","9è — novè","9e"],["dixième","10è — desè","10e"],["onzième","11è — onzè","11e"],["vingtième","20è — vintè","20e"]]
+      .map(([fr,ca,abbr])=>({fr,ca,abbr}))},
+  objets:{name:"Objectes de la classe",tip:"Aprèn cada objecte amb el seu article: le (masculí), la (femení), l' (davant de vocal) i les (plural). El gènere no sempre coincideix amb el català: la gomme, le cahier…",
+    items:[["la salle de classe","l'aula","f"],["le tableau","la pissarra","m"],["le tableau interactif","la pissarra digital","m"],["le bureau","la taula del professor","m"],
+      ["la table","la taula","f"],["la chaise","la cadira","f"],["la fenêtre","la finestra","f"],["la corbeille","la paperera","f"],["la poubelle","el cubell de les escombraries","f"],
+      ["le stylo","el bolígraf","m"],["le crayon","el llapis","m"],["la gomme","la goma","f"],["la règle","el regle","f"],["le feutre","el retolador","m"],
+      ["le taille-crayon","la maquineta","m"],["les ciseaux","les tisores","p"],["la colle","la cola","f"],["la trousse","l'estoig","f"],
+      ["le cahier","la llibreta","m"],["le cahier de textes","l'agenda escolar","m"],["le livre","el llibre","m"],["la feuille","el full","f"],
+      ["le sac à dos","la motxilla","m"],["l'ordinateur","l'ordinador","m"],["la calculatrice","la calculadora","f"]]
+      .map(([fr,ca,g])=>({fr,ca,g}))},
+  maison:{name:"Objectes de casa",tip:"Aquí els objectes van amb l'article indefinit: un (masculí) o une (femení). Compte: un torchon, un séchoir i un vase són masculins en francès.",
+    rooms:{tot:"Tota la casa",cuisine:"La cuisine · cuina",bain:"La salle de bains · bany",salon:"Le salon · menjador i sala",chambre:"La chambre · habitació",divers:"Divers · altres"},
+    items:`cuisine|une planche à découper|una taula de tallar|f
+cuisine|un couteau|un ganivet|m
+cuisine|une fourchette|una forquilla|f
+cuisine|une cuillère|una cullera|f
+cuisine|une assiette|un plat|f
+cuisine|un verre|un got|m
+cuisine|une tasse|una tassa|f
+cuisine|un bol|un bol|m
+cuisine|une casserole|una olla|f
+cuisine|une poêle|una paella|f
+cuisine|une louche|un cullerot|f
+cuisine|une passoire|un colador|f
+cuisine|un torchon|un drap de cuina|m
+cuisine|un moulin à poivre|un molinet de pebre|m
+cuisine|un tire-bouchon|un llevataps|m
+cuisine|un ouvre-boîte|un obrellaunes|m
+cuisine|un frigo|una nevera|m
+cuisine|un four|un forn|m
+cuisine|un micro-ondes|un microones|m
+cuisine|un lave-vaisselle|un rentaplats|m
+cuisine|un évier|una aigüera|m
+cuisine|une bouilloire|un bullidor|f
+cuisine|une cafetière|una cafetera|f
+cuisine|un grille-pain|una torradora|m
+bain|une brosse à dents|un raspall de dents|f
+bain|un dentifrice|una pasta de dents|m
+bain|un savon|un sabó|m
+bain|un shampooing|un xampú|m
+bain|une serviette|una tovallola|f
+bain|un miroir|un mirall|m
+bain|une douche|una dutxa|f
+bain|une baignoire|una banyera|f
+bain|un lavabo|un rentamans|m
+bain|un sèche-cheveux|un assecador de cabells|m
+bain|un peigne|una pinta|m
+bain|une brosse à cheveux|un raspall de cabells|f
+bain|un bandeau pour les cheveux|una cinta per als cabells|m
+bain|un rasoir|una maquineta d'afaitar|m
+bain|un rouleau de papier toilette|un rotlle de paper de vàter|m
+salon|une table|una taula|f
+salon|une chaise|una cadira|f
+salon|une nappe|unes estovalles|f
+salon|une serviette de table|un tovalló|f
+salon|un vase|un gerro|m
+salon|un bouquet de fleurs|un ram de flors|m
+salon|un canapé|un sofà|m
+salon|un fauteuil|una butaca|m
+salon|une télé|una tele|f
+salon|une télécommande|un comandament a distància|f
+salon|une lampe|un llum|f
+salon|un tapis|una catifa|m
+salon|une étagère|un prestatge|f
+salon|un rideau|una cortina|m
+salon|un coussin|un coixí (de sofà)|m
+salon|une horloge|un rellotge de paret|f
+salon|un ventilateur|un ventilador|m
+chambre|un lit|un llit|m
+chambre|un oreiller|un coixí (de llit)|m
+chambre|un drap|un llençol|m
+chambre|une couverture|una manta|f
+chambre|une couette|un nòrdic|f
+chambre|une armoire|un armari|f
+chambre|une commode|una calaixera|f
+chambre|une table de nuit|una tauleta de nit|f
+chambre|une lampe de chevet|un llum de tauleta|f
+chambre|un réveil|un despertador|m
+chambre|un cintre|un penjador|m
+divers|un couteau suisse|una navalla suïssa|m
+divers|une clé USB|una memòria USB|f
+divers|un séchoir à linge|un estenedor|m
+divers|une machine à laver|una rentadora|f
+divers|un fer à repasser|una planxa|m
+divers|un aspirateur|una aspiradora|m
+divers|un balai|una escombra|m
+divers|une clé|una clau|f
+divers|un chargeur|un carregador|m
+divers|une ampoule|una bombeta|f
+divers|un parapluie|un paraigua|m`.split("\n").map(l=>{const [r,fr,ca,g]=l.split("|");return {fr,ca,g,r}})},
+  mois:{name:"Els mesos",tip:"En francès els mesos s'escriuen en minúscula: le 12 octobre. Per dir «al gener»: en janvier.",
+    items:["janvier gener","février febrer","mars març","avril abril","mai maig","juin juny","juillet juliol","août agost","septembre setembre","octobre octubre","novembre novembre","décembre desembre"]
+      .map((s,i)=>{const [fr,ca]=s.split(" ");return {fr,ca,n:i+1}})},
+  jours:{name:"Dies de la setmana",tip:"Els dies també van en minúscula i la setmana comença per lundi. Lundi = dilluns (aquest dilluns); le lundi = els dilluns (cada dilluns).",
+    items:["lundi dilluns","mardi dimarts","mercredi dimecres","jeudi dijous","vendredi divendres","samedi dissabte","dimanche diumenge"]
+      .map((s,i)=>{const [fr,ca]=s.split(" ");return {fr,ca,n:i+1}})},
+  salut:{name:"Salutacions",tip:"Bonjour serveix tot el dia; bonsoir, a partir del vespre. Salut és informal, entre amics.",
+    items:[["Bonjour","Bon dia / Hola"],["Bonsoir","Bona tarda (vespre)"],["Salut","Hola (informal)"],["Au revoir","Adéu"],["À bientôt","Fins aviat"],
+      ["À demain","Fins demà"],["Bonne nuit","Bona nit"],["Comment ça va ?","Com va?"],["Ça va bien, merci","Va bé, gràcies"],
+      ["Comment tu t'appelles ?","Com et dius?"],["Je m'appelle Joan","Em dic Joan"],["Enchanté / Enchantée","Encantat / Encantada"],
+      ["S'il te plaît","Si us plau"],["Merci","Gràcies"],["De rien","De res"]]
+      .map(([fr,ca])=>({fr,ca}))}
+};
+
+const ACTS={
+  vocab:"Vocabulari", cartes:"Targetes", quiz:"Tria la resposta", escolta:"Escolta", escriu:"Escriu-ho", parelles:"Parelles",
+  calcul:"Càlcul", genre:"Masculí o femení?", ordre:"Ordena", parla:"Parla 🎤"
+};
+const ACTS_BY_THEME={
+  nombres:["vocab","cartes","escolta","quiz","calcul","escriu","parla"],
+  ordinaux:["vocab","cartes","quiz","parelles","escriu","parla"],
+  objets:["vocab","cartes","genre","quiz","escolta","escriu","parla"],
+  maison:["vocab","cartes","genre","quiz","escolta","parelles","escriu","parla"],
+  mois:["vocab","cartes","ordre","escolta","quiz","escriu","parla"],
+  jours:["vocab","cartes","ordre","escolta","quiz","parelles","escriu","parla"],
+  salut:["vocab","cartes","quiz","parelles","escolta","parla"]
+};
+/* Speech recognition (works when the page is opened directly in Chrome, Edge or Safari) */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let srBlocked=false, parlaMode="llegeix";
+function lev(a,b){const m=a.length,n=b.length;if(!m||!n)return Math.max(m,n);let p=[...Array(n+1).keys()];
+  for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+const snorm=s=>norm(s).replace(/-/g," ").replace(/^(les|le|la|l'|une|un) ?/,"").trim();
+
+let theme="nombres", act="vocab", room="tot", score={ok:0,total:0};
+const $=s=>document.querySelector(s);
+const stage=$("#stage");
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’']/g,"'").replace(/[?!.,]/g,"").replace(/-/g," ").replace(/\s+/g," ").trim();
+const spoken=fr=>fr.split(" / ")[0];
+
+/* Text-to-speech in French */
+let frVoice=null;
+function pickVoice(){try{const v=speechSynthesis.getVoices();frVoice=v.find(x=>/^fr(-|_)FR/i.test(x.lang))||v.find(x=>/^fr/i.test(x.lang))||null}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function say(text,rate=.85){
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="fr-FR";u.rate=rate;if(frVoice)u.voice=frVoice;ttsBusy=true;u.onend=u.onerror=()=>setTimeout(()=>{ttsBusy=false},300);speechSynthesis.speak(u)}
+  catch(e){setFeedback("El navegador no pot reproduir l'àudio.","ko")}
+}
+function speakBtn(text,cls=""){return `<button class="speak ${cls}" data-say="${esc(text)}" aria-label="Escolta: ${esc(text)}">${SPK}<span>Écoute</span></button>`}
+stage.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)say(b.dataset.say)});
+
+function setFeedback(msg,kind){const f=$("#fb");if(f){f.textContent=msg;f.className="feedback "+(kind||"")}}
+function scoreBar(){return `<div class="score"><span>${ACTS[act]}</span><span>Encerts: <b>${score.ok}</b> / ${score.total}</span></div>`}
+function mark(ok){score.total++;if(ok)score.ok++;const s=stage.querySelector(".score b");if(s){s.textContent=score.ok;s.parentNode.lastChild.textContent=" / "+score.total}}
+const items=()=>{const t=THEMES[theme];return t.rooms&&room!=="tot"?t.items.filter(x=>x.r===room):t.items};
+function nextBtn(fn){return `<div class="row" style="margin-top:14px"><button class="btn" id="next">Següent →</button></div>`}
+function wireNext(fn){const n=$("#next");if(n)n.onclick=fn}
+
+/* Nav */
+function renderNav(){
+  $("#themes").innerHTML=Object.entries(THEMES).map(([k,t])=>`<button aria-pressed="${k===theme}" data-t="${k}">${t.name}</button>`).join("");
+  $("#acts").innerHTML=ACTS_BY_THEME[theme].map(a=>`<button role="tab" aria-pressed="${a===act}" data-a="${a}">${ACTS[a]}</button>`).join("");
+  $("#tip").textContent="💡 "+THEMES[theme].tip;
+  const R=THEMES[theme].rooms,rb=$("#rooms");rb.hidden=!R;
+  rb.innerHTML=R?Object.entries(R).map(([k,v])=>`<button aria-pressed="${k===room}" data-r="${k}">${v}</button>`).join(""):"";
+}
+$("#themes").onclick=e=>{const b=e.target.closest("[data-t]");if(!b)return;theme=b.dataset.t;act="vocab";room="tot";score={ok:0,total:0};renderNav();run()};
+$("#rooms").onclick=e=>{const b=e.target.closest("[data-r]");if(!b)return;room=b.dataset.r;score={ok:0,total:0};renderNav();run()};
+$("#acts").onclick=e=>{const b=e.target.closest("[data-a]");if(!b)return;act=b.dataset.a;score={ok:0,total:0};renderNav();run()};
+
+function caLabel(it){return it.g?`${it.ca} <span class="tag ${it.g}">${it.g==="m"?"masc.":it.g==="f"?"fem.":"plural"}</span>`:esc(it.ca)}
+
+/* One microphone session for the whole "Parla" activity: permission is asked once, then it keeps listening */
+let micOn=false,recG=null,onHeard=null,nextTimer=null,ttsBusy=false;
+function paintMic(){const m=$("#mic");if(m){m.textContent=micOn?"● Micròfon obert · toca per tancar":"🎤 Obre el micròfon";m.style.background=micOn?"var(--ko)":""}}
+function startMic(){
+  if(!SR||micOn)return;micOn=true;
+  recG=new SR();recG.lang="fr-FR";recG.continuous=true;recG.interimResults=false;recG.maxAlternatives=5;
+  recG.onresult=e=>{if(ttsBusy)return;const r=e.results[e.results.length-1];if(!r.isFinal)return;
+    const alts=[...r].map(a=>a.transcript.trim()).filter(Boolean);if(alts.length&&onHeard&&act==="parla")onHeard(alts)};
+  recG.onerror=e=>{if(["not-allowed","service-not-allowed","audio-capture"].includes(e.error)){srBlocked=true;stopMic();if(act==="parla")RUN.parla()}};
+  recG.onend=()=>{if(micOn){setTimeout(()=>{try{micOn&&recG.start()}catch(e){}},200)}};
+  try{recG.start()}catch(e){micOn=false}
+  paintMic();setFeedback("Micròfon obert. Digues la paraula quan vulguis.","");
+}
+function stopMic(){micOn=false;try{recG&&recG.stop()}catch(e){}recG=null;paintMic()}
+/* Activities */
+const RUN={
+  vocab(){
+    stage.innerHTML=`<p class="label">Llista · toca per escoltar</p><div class="tablewrap"><table class="vocab"><tbody>${
+      items().map((it,i,a)=>(THEMES[theme].rooms&&it.r!==(a[i-1]||{}).r?`<tr><td colspan="3" class="label" style="padding-top:14px;font-weight:700;color:var(--violet)">${THEMES[theme].rooms[it.r]}</td></tr>`:"")+`<tr><td>${esc(it.fr)}${it.abbr?` <span style="color:var(--ink-soft);font-weight:400">(${it.abbr})</span>`:""}</td><td>${caLabel(it)}</td><td style="text-align:right"><button data-say="${esc(spoken(it.fr))}" aria-label="Escolta ${esc(it.fr)}">${SPK}</button></td></tr>`).join("")
+    }</tbody></table></div>`;
+  },
+  cartes(){
+    let order=shuffle(items()),i=0,flipped=false;
+    const draw=()=>{const it=order[i];
+      stage.innerHTML=`<div class="score"><span>Targeta ${i+1} / ${order.length}</span><span>Toca la targeta per girar-la</span></div>
+      <div class="flash"><div class="flash-inner" id="card" tabindex="0" role="button" aria-label="Gira la targeta">
+        ${flipped?`<div class="ca">${caLabel(it)}</div><div class="fr" style="font-size:1.8rem">${esc(it.fr)}</div>`:`<div class="fr">${esc(it.fr)}</div><div class="hint">Què vol dir?</div>`}
+      </div></div>
+      <div class="row">${speakBtn(spoken(it.fr))}<button class="btn ghost" id="prev">← Anterior</button><button class="btn" id="nx">Següent →</button></div>`;
+      const flip=()=>{flipped=!flipped;draw()};
+      $("#card").onclick=flip;$("#card").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip()}};
+      $("#nx").onclick=()=>{i=(i+1)%order.length;flipped=false;draw()};
+      $("#prev").onclick=()=>{i=(i-1+order.length)%order.length;flipped=false;draw()};
+    };draw();
+  },
+  quiz(){
+    const it=pick();const dir=rnd(2); // 0: FR→CA, 1: CA→FR
+    const others=distract(it);const opts=shuffle([it,...others]);
+    stage.innerHTML=scoreBar()+`<p class="label">${dir?"Com es diu en francès?":"Què vol dir?"}</p>
+      <p class="prompt ${dir?"small":""}">${dir?esc(it.ca):esc(it.fr)}</p>
+      ${dir?"":`<div class="row">${speakBtn(spoken(it.fr))}</div>`}
+      <div class="opts">${opts.map(o=>`<button class="opt" data-ok="${o===it}">${esc(dir?o.fr:o.ca)}</button>`).join("")}</div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    answerOpts(it);wireNext(RUN.quiz);
+  },
+  escolta(){
+    const it=pick();
+    const others=distract(it);const opts=shuffle([it,...others]);
+    const show=o=>theme==="nombres"?o.ca:o.fr;
+    stage.innerHTML=scoreBar()+`<p class="label">Escolta i tria el que has sentit</p>
+      <div class="row" style="margin:14px 0 18px">${speakBtn(spoken(it.fr),"big-speak")}<button class="speak" id="slow" aria-label="Escolta a poc a poc">🐢 Lent</button></div>
+      <div class="opts">${opts.map(o=>`<button class="opt" data-ok="${o===it}" style="${theme==="nombres"?"font-size:1.6rem;font-weight:700":""}">${esc(show(o))}</button>`).join("")}</div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    $("#slow").onclick=()=>say(spoken(it.fr),.55);
+    answerOpts(it);wireNext(RUN.escolta);
+  },
+  escriu(){
+    const it=pick();
+    const target=it.fr.split(" / ");
+    stage.innerHTML=scoreBar()+`<p class="label">Escriu-ho en francès</p>
+      <p class="prompt small">${theme==="nombres"?`<span style="font-family:var(--f-display);font-size:3.4rem">${esc(it.ca)}</span>`:esc(it.ca)}</p>
+      <form id="wf" class="row" style="flex-direction:column">
+        <label for="ans" class="label" style="margin:0">La teva resposta</label>
+        <input id="ans" class="answer" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <div class="accents">${"é è ê à â ç ô û ù ï ë œ".split(" ").map(c=>`<button type="button" data-c="${c}">${c}</button>`).join("")}</div>
+        <div class="row" style="margin-top:10px"><button class="btn" type="submit">Comprova</button><button class="btn ghost" type="button" id="hint">Pista</button></div>
+      </form>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    const inp=$("#ans");inp.focus({preventScroll:true});
+    stage.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{const p=inp.selectionStart??inp.value.length;inp.value=inp.value.slice(0,p)+b.dataset.c+inp.value.slice(p);inp.focus();inp.setSelectionRange(p+1,p+1)});
+    $("#hint").onclick=()=>setFeedback("Comença per: «"+target[0].slice(0,Math.ceil(target[0].length/3))+"…»","");
+    let done=false;
+    $("#wf").onsubmit=e=>{e.preventDefault();if(done)return;const v=inp.value.trim();if(!v)return;
+      const exact=target.some(t=>t.toLowerCase()===v.toLowerCase().replace(/’/g,"'"));
+      const close=target.some(t=>norm(t)===norm(v));
+      done=true;mark(exact||close);say(spoken(it.fr));
+      if(exact)setFeedback("✔ Très bien ! "+it.fr,"ok");
+      else if(close)setFeedback("✔ Gairebé! Revisa els accents: "+it.fr,"ok");
+      else setFeedback("✘ La resposta és: "+it.fr,"ko");};
+    wireNext(RUN.escriu);
+  },
+  parelles(){
+    const set=shuffle(items()).slice(0,6);const left=shuffle(set),right=shuffle(set);let sel=null,found=0,tries=0;
+    stage.innerHTML=`<div class="score"><span>Uneix cada expressió amb la traducció</span><span id="pc">0 / ${set.length}</span></div>
+      <div class="match"><div class="col">${left.map(o=>`<button class="opt" data-side="l" data-k="${esc(o.fr)}">${esc(o.fr)}</button>`).join("")}</div>
+      <div class="col">${right.map(o=>`<button class="opt" data-side="r" data-k="${esc(o.fr)}">${esc(o.ca)}</button>`).join("")}</div></div>
+      <p class="feedback" id="fb"></p><div class="row" style="margin-top:8px"><button class="btn" id="next">Nova ronda</button></div>`;
+    stage.querySelector(".match").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.classList.contains("done"))return;
+      if(b.dataset.side==="l")say(spoken(b.dataset.k));
+      if(!sel||sel.dataset.side===b.dataset.side){if(sel)sel.classList.remove("sel");sel=b;b.classList.add("sel");return}
+      tries++;
+      if(sel.dataset.k===b.dataset.k){[sel,b].forEach(x=>{x.classList.remove("sel");x.classList.add("done");x.disabled=true});found++;$("#pc").textContent=found+" / "+set.length;
+        setFeedback(found===set.length?`Bravo ! Fet en ${tries} intents.`:"✔","ok")}
+      else{const a=sel;[a,b].forEach(x=>x.classList.add("ko"));setTimeout(()=>[a,b].forEach(x=>x.classList.remove("ko","sel")),600);setFeedback("Torna-ho a provar","ko")}
+      sel=null};
+    wireNext(RUN.parelles);
+  },
+  calcul(){
+    let a,b,op,r;const lvl=rnd(3);
+    do{const m=lvl===0?11:lvl===1?600:500001;const unit=lvl===2&&rnd(2)?1000:1;
+      a=rnd(m/unit)*unit;b=rnd(m/unit)*unit;op=rnd(2)?"plus":"moins";if(op==="moins"&&b>a)[a,b]=[b,a];r=op==="plus"?a+b:a-b}while(r>1e6);
+    const opts=shuffle([r,...nearNums(r,3)]);
+    const sentence=`${frNum(a)} ${op} ${frNum(b)}`;
+    stage.innerHTML=scoreBar()+`<p class="label">Calcula i tria la resposta en francès</p>
+      <p class="prompt" style="font-size:clamp(1.6rem,6vw,2.6rem)">${esc(sentence)}</p><div class="row">${speakBtn(sentence+" égale combien ?")}</div>
+      <div class="opts">${opts.map(n=>`<button class="opt" data-ok="${n===r}">${esc(frNum(n))}</button>`).join("")}</div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    answerOpts({fr:`${sentence} égale ${frNum(r)}`,ca:`${fmt(a)} ${op==="plus"?"+":"−"} ${fmt(b)} = ${fmt(r)}`},true);wireNext(RUN.calcul);
+  },
+  genre(){
+    const pool=items().filter(x=>/^(le|la|un|une) /.test(x.fr));const it=pool[rnd(pool.length)];const noun=it.fr.replace(/^(le|la|une|un) /,"");
+    const indef=/^une? /.test(it.fr);
+    stage.innerHTML=scoreBar()+`<p class="label">Masculí o femení?</p>
+      <p class="prompt">… ${esc(noun)}</p><p style="text-align:center;margin:-6px 0 10px;color:var(--ink-soft)">${esc(it.ca)}</p>
+      <div class="gender"><button class="opt" data-g="m" data-ok="${it.g==="m"}">${indef?"un":"le"}</button><button class="opt" data-g="f" data-ok="${it.g==="f"}">${indef?"une":"la"}</button></div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    answerOpts(it);wireNext(RUN.genre);
+  },
+  parla(){
+    clearTimeout(nextTimer);onHeard=null;
+    const it=pick();
+    const targets=it.fr.split(" / ").map(t=>t.replace(/ Joan$/,""));
+    const accept=[...targets,...it.fr.split(" / "),...(it.n!=null&&theme==="nombres"?[String(it.n)]:[]),...(it.abbr?[it.abbr]:[])];
+    const canListen=SR&&!srBlocked;
+    const shown=parlaMode==="llegeix"
+      ?`<p class="label">Llegeix-ho en veu alta</p><p class="prompt">${esc(it.fr)}</p>`
+      :`<p class="label">Digues-ho en francès (de memòria)</p><p class="prompt small">${theme==="nombres"?`<span style="font-family:var(--f-display);font-size:3.4rem">${esc(it.ca)}</span>`:esc(it.ca)}</p>`;
+    stage.innerHTML=scoreBar()+`<div class="row" style="margin-bottom:10px">
+        <button class="speak" id="m-l" aria-pressed="${parlaMode==="llegeix"}" style="${parlaMode==="llegeix"?"":"background:transparent"}">Llegir</button>
+        <button class="speak" id="m-r" aria-pressed="${parlaMode==="recita"}" style="${parlaMode==="recita"?"":"background:transparent"}">Recitar</button></div>
+      ${shown}
+      <div class="row" style="margin:6px 0 4px">${canListen?`<button class="btn mic" id="mic">🎤 Obre el micròfon</button>`:""}<span id="model" ${parlaMode==="recita"?"hidden":""}>${speakBtn(spoken(it.fr))}</span></div>
+      <p id="heard" style="text-align:center;color:var(--ink-soft);min-height:1.5em;margin:8px 0 0"></p>
+      <div class="row" id="self" ${canListen?"hidden":""} style="margin-top:8px">
+        <button class="btn ghost" id="s-ko">Ho he de repetir</button><button class="btn" id="s-ok">Ho he dit bé</button></div>
+      <p class="feedback" id="fb">${canListen?"":"Aquí no es pot fer servir el micròfon. Digues-ho en veu alta, escolta el model i valora-ho tu mateix."}</p>`+nextBtn();
+    $("#m-l").onclick=()=>{parlaMode="llegeix";RUN.parla()};$("#m-r").onclick=()=>{parlaMode="recita";RUN.parla()};
+    let done=false;
+    const reveal=()=>{const m=$("#model");if(m)m.hidden=false};
+    if(!canListen){
+      if(parlaMode==="recita"){$("#self").hidden=true;const r=document.createElement("div");r.className="row";r.innerHTML=`<button class="btn ghost" id="show">Mostra la resposta</button>`;$("#self").before(r);
+        $("#show").onclick=()=>{r.remove();reveal();$("#self").hidden=false;$("#heard").textContent=it.fr;say(spoken(it.fr))}}
+      $("#s-ok").onclick=()=>{if(done)return;done=true;mark(true);setFeedback("✔ Très bien !","ok")};
+      $("#s-ko").onclick=()=>{if(done)return;done=true;mark(false);setFeedback("Escolta el model i torna-ho a provar.","ko");say(spoken(it.fr))};
+    } else {
+      paintMic();
+      $("#mic").onclick=()=>micOn?stopMic():startMic();
+      onHeard=alts=>{
+        let best=alts[0],bestScore=0;
+        for(const a of alts)for(const t of accept){const x=snorm(a),y=snorm(t);const s=1-lev(x,y)/Math.max(x.length,y.length,1);if(s>bestScore){bestScore=s;best=a}}
+        if(theme==="nombres"&&alts.some(a=>a.replace(/\D/g,"")===String(it.n))){bestScore=1;best=alts.find(a=>a.replace(/\D/g,"")===String(it.n))}
+        $("#heard").innerHTML=`He entès: «<b>${esc(best)}</b>»`;
+        const counted=!done;done=true;
+        if(bestScore>=.99){if(counted)mark(true);setFeedback("✔ Parfait ! Pronúncia reconeguda.","ok");nextTimer=setTimeout(RUN.parla,1600)}
+        else if(bestScore>=.7){if(counted)mark(true);setFeedback("✔ Gairebé! Era: "+it.fr,"ok");reveal();nextTimer=setTimeout(RUN.parla,2600)}
+        else{if(counted)mark(false);setFeedback("✘ No ho he reconegut. Era: "+it.fr+" — torna-ho a provar.","ko");reveal();say(spoken(it.fr))}
+      };
+    }
+    wireNext(RUN.parla);
+  },
+  ordre(){
+    const all=items();const start=rnd(all.length);const seq=[0,1,2,3].map(k=>all[(start+k)%all.length]);let pos=0;
+    stage.innerHTML=scoreBar()+`<p class="label">Toca els ${theme==="jours"?"dies":"mesos"} en ordre (comença per ${esc(seq[0].ca)})</p>
+      <p class="prompt small" id="built" style="min-height:2.2em">…</p>
+      <div class="opts">${shuffle(seq).map(o=>`<button class="opt" data-k="${o.fr}">${o.fr}</button>`).join("")}</div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    const built=[];
+    stage.querySelector(".opts").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;say(b.dataset.k);
+      if(b.dataset.k===seq[pos].fr){b.classList.add("ok");b.disabled=true;built.push(b.dataset.k);pos++;$("#built").textContent=built.join(" → ");
+        if(pos===seq.length){mark(true);setFeedback("✔ Parfait !","ok")}}
+      else{b.classList.add("ko");setTimeout(()=>b.classList.remove("ko"),500);if(!stage.dataset.missed){mark(false);stage.dataset.missed=1}setFeedback("No, aquest no toca encara","ko")}};
+    delete stage.dataset.missed;wireNext(RUN.ordre);
+  }
+};
+
+function answerOpts(it,isCalc){
+  stage.querySelectorAll(".opts .opt, .gender .opt").forEach(b=>b.onclick=()=>{
+    const ok=b.dataset.ok==="true";
+    stage.querySelectorAll(".opts .opt, .gender .opt").forEach(x=>{x.disabled=true;if(x.dataset.ok==="true")x.classList.add("ok")});
+    if(!ok)b.classList.add("ko");mark(ok);
+    const full=theme==="objets"&&act==="genre"?it.fr:isCalc?it.ca:`${it.fr} = ${it.ca}`;
+    setFeedback((ok?"✔ Très bien ! ":"✘ Oh non… ")+full,ok?"ok":"ko");
+    say(spoken(it.fr));
+  });
+}
+
+function run(){clearTimeout(nextTimer);if(act!=="parla"&&micOn)stopMic();RUN[act]()}
+renderNav();run();
+</script>
+
+</body></html>
