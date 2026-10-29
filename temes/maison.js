@@ -1,0 +1,31 @@
+/* Objectes de casa
+   Per corregir o ampliar aquest tema, edita només aquest fitxer.
+   Els camps estan explicats a index.html. */
+CAHIER.tema({id:"maison",bloc:"vocabulari",titol:"Objectes de casa",mostra:"un torchon",desc:"Cuina, bany, menjador i habitació",afegit:"2026-10-12",
+ consell:"Aquí els objectes van amb l'article indefinit: un (masculí) o une (femení). Compte: un torchon, un séchoir i un vase són masculins en francès.",
+ estances:{tot:"Tota la casa",cuisine:"La cuisine · cuina",bain:"La salle de bains · bany",salon:"Le salon · menjador i sala",chambre:"La chambre · habitació",divers:"Divers · altres"},
+ items:[
+  ["une planche à découper","una taula de tallar","f","cuisine"],["un couteau","un ganivet","m","cuisine"],["une fourchette","una forquilla","f","cuisine"],
+  ["une cuillère","una cullera","f","cuisine"],["une assiette","un plat","f","cuisine"],["un verre","un got","m","cuisine"],["une tasse","una tassa","f","cuisine"],
+  ["un bol","un bol","m","cuisine"],["une casserole","una olla","f","cuisine"],["une poêle","una paella","f","cuisine"],["une louche","un cullerot","f","cuisine"],
+  ["une passoire","un colador","f","cuisine"],["un torchon","un drap de cuina","m","cuisine"],["un moulin à poivre","un molinet de pebre","m","cuisine"],
+  ["un tire-bouchon","un llevataps","m","cuisine"],["un ouvre-boîte","un obrellaunes","m","cuisine"],["un frigo","una nevera","m","cuisine"],["un four","un forn","m","cuisine"],
+  ["un micro-ondes","un microones","m","cuisine"],["un lave-vaisselle","un rentaplats","m","cuisine"],["un évier","una aigüera","m","cuisine"],
+  ["une bouilloire","un bullidor","f","cuisine"],["une cafetière","una cafetera","f","cuisine"],["un grille-pain","una torradora","m","cuisine"],
+  ["une brosse à dents","un raspall de dents","f","bain"],["un dentifrice","una pasta de dents","m","bain"],["un savon","un sabó","m","bain"],["un shampooing","un xampú","m","bain"],
+  ["une serviette","una tovallola","f","bain"],["un miroir","un mirall","m","bain"],["une douche","una dutxa","f","bain"],["une baignoire","una banyera","f","bain"],
+  ["un lavabo","un rentamans","m","bain"],["un sèche-cheveux","un assecador de cabells","m","bain"],["un peigne","una pinta","m","bain"],
+  ["une brosse à cheveux","un raspall de cabells","f","bain"],["un bandeau pour les cheveux","una cinta per als cabells","m","bain"],["un rasoir","una maquineta d'afaitar","m","bain"],
+  ["un rouleau de papier toilette","un rotlle de paper de vàter","m","bain"],
+  ["une table","una taula","f","salon"],["une chaise","una cadira","f","salon"],["une nappe","unes estovalles","f","salon"],["une serviette de table","un tovalló","f","salon"],
+  ["un vase","un gerro","m","salon"],["un bouquet de fleurs","un ram de flors","m","salon"],["un canapé","un sofà","m","salon"],["un fauteuil","una butaca","m","salon"],
+  ["une télé","una tele","f","salon"],["une télécommande","un comandament a distància","f","salon"],["une lampe","un llum","f","salon"],["un tapis","una catifa","m","salon"],
+  ["une étagère","un prestatge","f","salon"],["un rideau","una cortina","m","salon"],["un coussin","un coixí (de sofà)","m","salon"],["une horloge","un rellotge de paret","f","salon"],
+  ["un ventilateur","un ventilador","m","salon"],
+  ["un lit","un llit","m","chambre"],["un oreiller","un coixí (de llit)","m","chambre"],["un drap","un llençol","m","chambre"],["une couverture","una manta","f","chambre"],
+  ["une couette","un nòrdic","f","chambre"],["une armoire","un armari","f","chambre"],["une commode","una calaixera","f","chambre"],["une table de nuit","una tauleta de nit","f","chambre"],
+  ["une lampe de chevet","un llum de tauleta","f","chambre"],["un réveil","un despertador","m","chambre"],["un cintre","un penjador","m","chambre"],
+  ["un couteau suisse","una navalla suïssa","m","divers"],["une clé USB","una memòria USB","f","divers"],["un séchoir à linge","un estenedor","m","divers"],
+  ["une machine à laver","una rentadora","f","divers"],["un fer à repasser","una planxa","m","divers"],["un aspirateur","una aspiradora","m","divers"],
+  ["un balai","una escombra","m","divers"],["une clé","una clau","f","divers"],["un chargeur","un carregador","m","divers"],["une ampoule","una bombeta","f","divers"],
+  ["un parapluie","un paraigua","m","divers"]]});
