@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 </head><body>
 <title>Cahier de français</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
-/* Layout: a French school notebook (cahier Seyès) — red margin line, violet ink, one column of activity cards */
+/* Layout: a French school notebook (cahier Seyès). Index = list of chapters grouped by bloc; each tema = sticky header + scrollable activity tabs + one card */
 :root{
   --paper:#fbfaf7; --line:#d9dcef; --line-strong:#b9bfe3; --margin:#e0525a;
   --ink:#2b2350; --ink-soft:#5f5a7a; --violet:#5b3fb8; --violet-soft:#ece7fb;
@@ -29,87 +29,488 @@
 *{box-sizing:border-box}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
   background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--line) 31px 32px);}
-.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;position:relative}
-.wrap::before{content:"";position:absolute;left:4px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.55}
-header{padding-left:14px}
-h1{font-family:var(--f-display);font-size:clamp(2.4rem,7vw,3.4rem);line-height:1;margin:0;color:var(--violet);text-wrap:balance}
-.sub{margin:.35rem 0 0;color:var(--ink-soft)}
-nav.themes{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 10px;padding-left:14px}
-nav.themes button,.acts button{font:inherit;border:1.5px solid var(--line-strong);background:var(--card);color:var(--ink);
-  padding:.45rem .85rem;border-radius:999px;cursor:pointer}
-nav.themes button[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:var(--paper);font-weight:700}
-.acts{display:flex;flex-wrap:wrap;gap:6px;padding-left:14px;margin-bottom:14px}
-.acts button{font-size:.9rem;padding:.3rem .7rem;border-radius:8px}
-.acts button[aria-pressed="true"]{background:var(--violet-soft);border-color:var(--violet);color:var(--violet);font-weight:700}
-button:focus-visible,input:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
-.stage{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:22px 18px;margin-left:14px;min-height:300px}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:0 56px;position:relative;min-height:100vh}
+.wrap::before{content:"";position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.5}
+.in{padding-left:14px}
+a{color:var(--violet)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+
+/* ---------- index ---------- */
+.hero{padding-block:28px 6px}
+h1{font-family:var(--f-display);font-size:clamp(2.6rem,9vw,3.6rem);line-height:1;margin:0;color:var(--violet);text-wrap:balance}
+.sub{margin:.4rem 0 0;color:var(--ink-soft);max-width:60ch}
+.resume{display:flex;align-items:center;gap:10px;margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--violet-soft);color:var(--violet);
+  text-decoration:none;font-weight:700}
+.resume span{font-weight:400;color:var(--ink-soft)}
+.bloc{margin-top:26px}
+.bloc h2{font-family:var(--f-display);font-size:2rem;line-height:1;margin:0 0 10px;color:var(--ink)}
+.cards{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:600px){.cards{grid-template-columns:1fr 1fr}}
+.card{display:grid;grid-template-columns:5.6rem minmax(0,1fr);gap:12px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--card);
+  box-shadow:var(--shadow);text-decoration:none;color:var(--ink);min-height:76px;position:relative;padding-right:42px}
+.card:active{transform:scale(.99)}
+.chip{font-family:var(--f-display);font-size:1.45rem;line-height:1.05;color:var(--violet);text-align:center;overflow-wrap:anywhere}
+.card b{display:block;font-size:1.02rem;line-height:1.25}
+.card small{display:block;color:var(--ink-soft);font-size:.85rem;line-height:1.3;margin-top:2px}
+.prog{height:4px;border-radius:2px;background:var(--line);margin-top:8px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ok)}
+.progtxt{font-size:.75rem;color:var(--ink-soft);margin-top:3px;font-variant-numeric:tabular-nums}
+.nou{position:absolute;top:8px;right:10px;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--margin)}
+.foot{margin-top:32px;font-size:.85rem;color:var(--ink-soft);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.foot button{font:inherit;background:none;border:1px solid var(--line-strong);color:var(--ink-soft);border-radius:8px;padding:.3rem .7rem;cursor:pointer}
+
+/* ---------- tema ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);display:flex;align-items:center;gap:10px;
+  padding-block:10px;border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:30px 16px}
+.back{display:inline-flex;align-items:center;gap:4px;text-decoration:none;font-weight:700;color:var(--violet);padding:.4rem .2rem;flex:0 0 auto}
+.top h1{font-size:1.9rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-block:12px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button,.rooms button{font:inherit;font-size:.92rem;flex:0 0 auto;border:1.5px solid var(--line-strong);background:var(--card);color:var(--ink);
+  padding:.42rem .8rem;border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:var(--paper);font-weight:700}
+.rooms{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.rooms button{font-size:.82rem;padding:.3rem .65rem;border-radius:8px}
+.rooms button[aria-pressed="true"]{background:var(--violet-soft);border-color:var(--violet);color:var(--violet);font-weight:700}
+.stage{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:20px 16px;min-height:300px}
+.tip{margin:16px 0 0;color:var(--ink-soft);font-size:.92rem;max-width:65ch}
 .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:0 0 6px}
-.prompt{font-family:var(--f-display);font-size:clamp(2.2rem,8vw,3.2rem);line-height:1.1;margin:4px 0 14px;text-align:center;overflow-wrap:anywhere}
-.prompt.small{font-family:var(--f-body);font-size:1.4rem;font-weight:700}
+.prompt{font-family:var(--f-display);font-size:clamp(2.1rem,8vw,3.1rem);line-height:1.1;margin:4px 0 14px;text-align:center;overflow-wrap:anywhere}
+.prompt.small{font-family:var(--f-body);font-size:1.35rem;font-weight:700}
+.sent{font-size:1.4rem;font-weight:700;text-align:center;line-height:1.45;margin:6px 0 4px;overflow-wrap:anywhere}
+.gap{display:inline-block;min-width:3.4em;border-bottom:2.5px solid var(--violet);color:var(--violet);text-align:center}
+.cahint{text-align:center;color:var(--ink-soft);margin:0 0 6px}
+.why{text-align:center;color:var(--ink-soft);font-size:.95rem;margin:6px 0 0}
 .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
-.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
-@media (max-width:420px){.opts{grid-template-columns:1fr}}
-.opt{font:inherit;font-size:1.05rem;text-align:center;padding:.8rem .6rem;border-radius:10px;border:1.5px solid var(--line-strong);
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (max-width:420px){.opts.many{grid-template-columns:1fr}}
+.opt{font:inherit;font-size:1.08rem;text-align:center;padding:.8rem .6rem;border-radius:10px;border:1.5px solid var(--line-strong);
   background:var(--paper);color:var(--ink);cursor:pointer;min-width:0;overflow-wrap:anywhere}
 .opt:hover:not(:disabled){border-color:var(--violet)}
 .opt.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:700}
 .opt.ko{background:var(--ko-bg);border-color:var(--ko);color:var(--ko)}
-.btn{font:inherit;font-weight:700;padding:.6rem 1.1rem;border-radius:10px;border:0;background:var(--violet);color:var(--paper);cursor:pointer}
+.btn{font:inherit;font-weight:700;padding:.65rem 1.15rem;border-radius:10px;border:0;background:var(--violet);color:var(--paper);cursor:pointer}
 .btn.ghost{background:transparent;color:var(--violet);border:1.5px solid var(--violet)}
 .speak{font:inherit;display:inline-flex;align-items:center;gap:6px;padding:.5rem .9rem;border-radius:999px;border:1.5px solid var(--violet);
   background:var(--violet-soft);color:var(--violet);font-weight:700;cursor:pointer}
 .speak svg{width:18px;height:18px}
 .big-speak{font-size:1.2rem;padding:1rem 1.6rem}
-.flash{perspective:900px;margin:6px auto 16px;max-width:420px}
-.flash-inner{border:1.5px dashed var(--line-strong);border-radius:12px;padding:26px 14px;text-align:center;cursor:pointer;background:
-  repeating-linear-gradient(to bottom,transparent 0 23px,var(--line) 23px 24px);min-height:150px;display:flex;flex-direction:column;justify-content:center;gap:6px}
-.flash-inner .fr{font-family:var(--f-display);font-size:2.6rem;line-height:1.05;overflow-wrap:anywhere}
-.flash-inner .ca{font-size:1.15rem;color:var(--ink-soft)}
+.flash{margin:6px auto 16px;max-width:440px}
+.flash-inner{border:1.5px dashed var(--line-strong);border-radius:12px;padding:24px 14px;text-align:center;cursor:pointer;background:
+  repeating-linear-gradient(to bottom,transparent 0 23px,var(--line) 23px 24px);min-height:160px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flash-inner .fr{font-family:var(--f-display);font-size:2.4rem;line-height:1.1;overflow-wrap:anywhere}
+.flash-inner .ca{font-size:1.1rem;color:var(--ink-soft)}
 .flash-inner .hint{font-size:.8rem;color:var(--ink-soft)}
 .feedback{min-height:1.6em;text-align:center;margin-top:12px;font-weight:700}
 .feedback.ok{color:var(--ok)} .feedback.ko{color:var(--ko)}
 input.answer{font:inherit;font-size:1.3rem;width:100%;max-width:420px;padding:.6rem .8rem;border-radius:10px;border:1.5px solid var(--line-strong);
   background:var(--paper);color:var(--ink);text-align:center}
 .accents{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
-.accents button{font:inherit;min-width:36px;padding:.25rem .5rem;border-radius:6px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);cursor:pointer}
-.score{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.9rem;color:var(--ink-soft);margin-bottom:12px;font-variant-numeric:tabular-nums}
+.accents button{font:inherit;min-width:38px;min-height:38px;padding:.25rem .5rem;border-radius:6px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);cursor:pointer}
+.score{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.88rem;color:var(--ink-soft);margin-bottom:12px;font-variant-numeric:tabular-nums}
 .score b{color:var(--ink)}
-.gender{display:flex;gap:12px;justify-content:center;margin-top:8px}
-.gender .opt{min-width:120px;font-family:var(--f-display);font-size:2rem;padding:.4rem 1rem}
+.gender{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:8px}
+.gender .opt{min-width:110px;font-family:var(--f-display);font-size:2rem;padding:.4rem 1rem}
 .gender .opt[data-g="m"]{color:var(--masc)} .gender .opt[data-g="f"]{color:var(--fem)}
 .gender .opt.ok,.gender .opt.ko{color:inherit}
-.tag{font-size:.75rem;font-weight:700;padding:.1rem .45rem;border-radius:999px;border:1px solid currentColor}
-.tag.m{color:var(--masc)} .tag.f{color:var(--fem)}
-.tip{margin:16px 0 0 14px;color:var(--ink-soft);font-size:.9rem;max-width:65ch}
+.tag{font-size:.72rem;font-weight:700;padding:.08rem .45rem;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.tag.m{color:var(--masc)} .tag.f{color:var(--fem)} .tag.p{color:var(--ink-soft)}
 .match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .match .col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.match .opt{font-size:.98rem;padding:.7rem .5rem}
 .match .opt.sel{border-color:var(--violet);background:var(--violet-soft)}
 .match .opt.done{opacity:.45;background:var(--ok-bg);border-color:var(--ok);cursor:default}
 .vocab{width:100%;border-collapse:collapse;font-size:.95rem}
-.vocab td{padding:.45rem .4rem;border-bottom:1px solid var(--line)}
+.vocab td{padding:.45rem .4rem;border-bottom:1px solid var(--line);vertical-align:middle}
 .vocab td:first-child{font-weight:700}
-.vocab button{background:none;border:0;color:var(--violet);cursor:pointer;padding:4px}
+.vocab button{background:none;border:0;color:var(--violet);cursor:pointer;padding:6px}
+.vocab svg{width:18px;height:18px}
 .tablewrap{overflow-x:auto}
-@media (prefers-reduced-motion:no-preference){.opt,.btn,.flash-inner{transition:background .15s,border-color .15s,transform .15s}.opt:active{transform:scale(.98)}}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.tile{font:inherit;font-size:1.1rem;padding:.5rem .8rem;border-radius:10px;border:1.5px solid var(--line-strong);background:var(--paper);color:var(--ink);cursor:pointer}
+.built{min-height:3.2rem;border-bottom:2px dashed var(--line-strong);display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;padding:6px 0}
+.built .tile{background:var(--violet-soft);border-color:var(--violet);color:var(--violet);font-weight:700}
+/* rule sheets */
+.regla{max-width:65ch;margin:0 auto}
+.regla h3{font-family:var(--f-display);font-size:1.8rem;line-height:1.1;color:var(--violet);margin:18px 0 6px}
+.regla h3:first-child{margin-top:0}
+.regla p,.regla li{margin:.35rem 0}
+.regla ul{padding-left:1.2rem;margin:.3rem 0}
+.regla table{border-collapse:collapse;width:100%;font-size:.95rem;margin:6px 0}
+.regla th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);padding:.35rem .4rem;border-bottom:1.5px solid var(--line-strong)}
+.regla td{padding:.4rem .4rem;border-bottom:1px solid var(--line);vertical-align:top}
+.ex{color:var(--violet);font-weight:700;border-bottom:1px dotted currentColor;cursor:pointer}
+.alerta{background:var(--violet-soft);border-radius:10px;padding:10px 12px;margin:10px 0}
+details.verb{border:1.5px solid var(--line);border-radius:10px;margin:8px 0;background:var(--paper)}
+details.verb summary{cursor:pointer;padding:.6rem .8rem;font-weight:700;list-style-position:inside}
+details.verb summary span{font-weight:400;color:var(--ink-soft)}
+details.verb table{margin:0}
+details.verb td{padding:.35rem .8rem}
+@media (prefers-reduced-motion:no-preference){.opt,.btn,.tile,.flash-inner,.card{transition:background .15s,border-color .15s,transform .15s}.opt:active,.tile:active{transform:scale(.97)}}
 </style>
 
-<div class="wrap">
-  <header>
-    <h1>Cahier de français</h1>
-    <p class="sub">Nombres, ordinals, objectes de la classe i de casa, mesos, dies de la setmana i salutacions. Toca 🔊 per escoltar la pronúncia.</p>
-  </header>
-
-  <nav class="themes" id="themes" aria-label="Temes"></nav>
-  <div class="acts" id="rooms" aria-label="Estances de la casa" hidden></div>
-  <div class="acts" id="acts" role="tablist" aria-label="Activitats"></div>
-  <section class="stage" id="stage" aria-live="polite"></section>
-  <p class="tip" id="tip"></p>
-</div>
+<div class="wrap" id="app"></div>
 
 <script>
-const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+/* ======================================================================
+   CONTINGUTS DEL CAHIER
+   ----------------------------------------------------------------------
+   Cada tema és un bloc { ... } dins de TEMES. Per afegir-ne un de nou,
+   copia'n un de semblant, canvia l'id (sense espais) i omple'l.
+   Apareix sol a l'índex, dins del bloc que indiquis.
 
-/* French numbers 0 – 1 000 000 (traditional spelling) */
+   Camps:
+     id        identificador curt: "couleurs"
+     bloc      "comunicacio" | "vocabulari" | "mon" | "gramatica"
+     titol     nom del tema a l'índex
+     mostra    2-3 paraules d'exemple que surten a la targeta
+     desc      una línia de descripció
+     afegit    data "AAAA-MM-DD" (durant 2 setmanes surt l'etiqueta «Nou»)
+     consell   frase d'ajuda que surt sota les activitats
+     regla     explicació (HTML). El francès entre «…» es pot escoltar.
+     items     vocabulari: ["français","català"] o ["le stylo","el bolígraf","m"]
+               (gènere: "m", "f" o "p" plural)
+     frases    frases per completar: ["J'habite ___ Paris.","à",["à","en","au","aux"],"Visc a París.","ciutat → à"]
+     parells   parelles per unir: [["Comment ça va ?","Ça va bien."], ...]
+     ordenat   true si els items tenen un ordre (mesos, dies…)
+   Les activitats es trien soles segons el que tingui el tema.
+   ====================================================================== */
+const BLOCS=[
+  {id:"comunicacio",nom:"Comunicació"},
+  {id:"vocabulari",nom:"Vocabulari"},
+  {id:"mon",nom:"El món"},
+  {id:"gramatica",nom:"Gramàtica"}
+];
+
+const TEMES=[
+/* ---------------- COMUNICACIÓ ---------------- */
+{id:"salut",bloc:"comunicacio",titol:"Salutacions",mostra:"Salut !",desc:"Bonjour, au revoir, merci… per saludar i presentar-te",afegit:"2026-10-12",
+ consell:"Bonjour serveix tot el dia; bonsoir, a partir del vespre. Salut és informal, entre amics.",
+ items:[["Bonjour","Bon dia / Hola"],["Bonsoir","Bona tarda (vespre)"],["Salut","Hola (informal)"],["Au revoir","Adéu"],["À bientôt","Fins aviat"],
+  ["À demain","Fins demà"],["Bonne nuit","Bona nit"],["Comment ça va ?","Com va?"],["Ça va bien, merci","Va bé, gràcies"],
+  ["Comment tu t'appelles ?","Com et dius?"],["Je m'appelle Joan","Em dic Joan"],["Enchanté / Enchantée","Encantat / Encantada"],
+  ["S'il te plaît","Si us plau"],["Merci","Gràcies"],["De rien","De res"]]},
+
+{id:"questions",bloc:"comunicacio",titol:"Les preguntes",mostra:"Quel… ?",desc:"Comment, où, quel / quelle… i com respondre",afegit:"2026-10-29",
+ consell:"Fixa't en el gènere de la paraula que ve després: quel âge (masculí), quelle adresse (femení).",
+ regla:`<h3>Les paraules per preguntar</h3>
+<table><tr><th>Francès</th><th>Català</th><th>Exemple</th></tr>
+<tr><td><b>Comment ?</b></td><td>Com?</td><td>«Comment tu t'appelles ?»</td></tr>
+<tr><td><b>Où ?</b></td><td>On?</td><td>«Où habites-tu ?»</td></tr>
+<tr><td><b>D'où ?</b></td><td>D'on?</td><td>«D'où viens-tu ?»</td></tr>
+<tr><td><b>Qui ?</b></td><td>Qui?</td><td>«Qui est-ce ?»</td></tr>
+<tr><td><b>Qu'est-ce que… ?</b></td><td>Què?</td><td>«Qu'est-ce que c'est ?»</td></tr>
+<tr><td><b>Quand ?</b></td><td>Quan?</td><td>«C'est quand, ton anniversaire ?»</td></tr>
+<tr><td><b>Combien ?</b></td><td>Quant?</td><td>«Combien de frères as-tu ?»</td></tr>
+<tr><td><b>Pourquoi ?</b></td><td>Per què?</td><td>«Pourquoi tu apprends le français ?»</td></tr></table>
+<p>La resposta a <b>pourquoi</b> comença per <b>parce que</b> (perquè): «Parce que j'aime voyager.»</p>
+<h3>Quel, quelle, quels, quelles</h3>
+<p>Vol dir «quin / quina» i concorda amb el nom:</p>
+<table><tr><th></th><th>Singular</th><th>Plural</th></tr>
+<tr><td>Masculí</td><td>«Quel âge as-tu ?»</td><td>«Quels sports fais-tu ?»</td></tr>
+<tr><td>Femení</td><td>«Quelle est ta nationalité ?»</td><td>«Quelles langues parles-tu ?»</td></tr></table>
+<p>Totes quatre formes sonen igual: [kɛl].</p>
+<h3>Tres maneres de preguntar</h3>
+<ul><li>Parlant, amb entonació: «Tu habites où ?»</li>
+<li>Amb <b>est-ce que</b>: «Où est-ce que tu habites ?»</li>
+<li>Amb inversió (més formal): «Où habites-tu ?» El verb i el pronom s'uneixen amb un guionet.</li></ul>`,
+ items:[["Comment tu t'appelles ?","Com et dius?"],["Comment ça va ?","Com va?"],["Quel âge as-tu ?","Quants anys tens?"],["Où habites-tu ?","On vius?"],
+  ["D'où viens-tu ?","D'on vens?"],["Quelle est ta nationalité ?","Quina és la teva nacionalitat?"],["Quelles langues parles-tu ?","Quines llengües parles?"],
+  ["Quel est ton numéro de téléphone ?","Quin és el teu número de telèfon?"],["Quelle est ton adresse ?","Quina és la teva adreça?"],
+  ["C'est quand, ton anniversaire ?","Quan és el teu aniversari?"],["Qui est-ce ?","Qui és?"],["Qu'est-ce que c'est ?","Què és això?"],
+  ["Combien de frères et sœurs as-tu ?","Quants germans tens?"],["Quel jour sommes-nous ?","Quin dia som?"],["Quelle heure est-il ?","Quina hora és?"],
+  ["Quel est ton sport préféré ?","Quin és el teu esport preferit?"],["Quelle est ta couleur préférée ?","Quin és el teu color preferit?"],
+  ["Tu aimes la musique ?","T'agrada la música?"],["Où est la gomme ?","On és la goma?"],["Pourquoi tu apprends le français ?","Per què aprens francès?"]],
+ parells:[["Comment tu t'appelles ?","Je m'appelle Laia."],["Comment ça va ?","Ça va bien, merci."],["Quel âge as-tu ?","J'ai douze ans."],
+  ["Où habites-tu ?","J'habite à Gérone."],["D'où viens-tu ?","Je viens d'Espagne."],["Quelle est ta nationalité ?","Je suis espagnole."],
+  ["Quelles langues parles-tu ?","Je parle catalan et espagnol."],["Quel est ton numéro de téléphone ?","C'est le 06 12 34 56 78."],
+  ["Quelle est ton adresse ?","C'est 8, rue Victor-Hugo."],["C'est quand, ton anniversaire ?","C'est le 14 mars."],["Qui est-ce ?","C'est ma sœur, Emma."],
+  ["Qu'est-ce que c'est ?","C'est une trousse."],["Combien de frères et sœurs as-tu ?","J'ai un frère."],["Quel jour sommes-nous ?","Nous sommes jeudi."],
+  ["Quelle heure est-il ?","Il est dix heures."],["Quel est ton sport préféré ?","C'est le basket."],["Quelle est ta couleur préférée ?","C'est le bleu."],
+  ["Tu aimes la musique ?","Oui, j'adore la musique !"],["Où est la gomme ?","Elle est sur la table."],["Pourquoi tu apprends le français ?","Parce que j'aime voyager."]],
+ frases:[
+  ["___ tu t'appelles ?","Comment",["Comment","Où","Quel","Qui"],"Com et dius?","Comment = com"],
+  ["___ habites-tu ? — À Barcelone.","Où",["Où","Quand","Comment","Qui"],"On vius? — A Barcelona.","Où = on"],
+  ["___ viens-tu ? — De Catalogne.","D'où",["D'où","Où","Qui","Quand"],"D'on vens? — De Catalunya.","D'où = d'on (origen)"],
+  ["___ âge as-tu ?","Quel",["Quel","Quelle","Quels","Quelles"],"Quants anys tens?","âge és masculí singular → quel"],
+  ["___ est ta nationalité ?","Quelle",["Quel","Quelle","Quels","Quelles"],"Quina és la teva nacionalitat?","nationalité és femení → quelle"],
+  ["___ est ton prénom ?","Quel",["Quel","Quelle","Quels","Quelles"],"Quin és el teu nom?","prénom és masculí → quel"],
+  ["___ langues parles-tu ?","Quelles",["Quel","Quelle","Quels","Quelles"],"Quines llengües parles?","langues: femení plural → quelles"],
+  ["___ sports fais-tu ?","Quels",["Quel","Quelle","Quels","Quelles"],"Quins esports fas?","sports: masculí plural → quels"],
+  ["___ est ton adresse ?","Quelle",["Quel","Quelle","Quels","Quelles"],"Quina és la teva adreça?","adresse és femení → quelle (i diem ton adresse perquè comença per vocal)"],
+  ["___ heure est-il ?","Quelle",["Quel","Quelle","Quels","Quelles"],"Quina hora és?","heure és femení → quelle"],
+  ["___ jour sommes-nous ?","Quel",["Quel","Quelle","Quels","Quelles"],"Quin dia som?","jour és masculí → quel"],
+  ["___ est-ce ? — C'est mon professeur.","Qui",["Qui","Où","Quel","Quand"],"Qui és? — És el meu professor.","per a persones → qui"],
+  ["___ c'est ? — C'est un taille-crayon.","Qu'est-ce que",["Qu'est-ce que","Qui","Où","Comment"],"Què és? — És una maquineta.","per a coses → qu'est-ce que"],
+  ["___ de frères as-tu ?","Combien",["Combien","Comment","Quand","Quel"],"Quants germans tens?","Combien de… = quants / quantes"],
+  ["C'est ___, ton anniversaire ? — Le 3 mai.","quand",["quand","où","qui","combien"],"Quan és el teu aniversari? — El 3 de maig.","quand = quan"],
+  ["___ tu apprends le français ? — Parce que j'aime la France.","Pourquoi",["Pourquoi","Parce que","Comment","Quand"],"Per què aprens francès? — Perquè m'agrada França.","pregunta: pourquoi · resposta: parce que"],
+  ["___ est-ce que tu habites ?","Où",["Où","Qui","Quel","Combien"],"On vius?","Où + est-ce que + subjecte + verb"]]},
+
+/* ---------------- VOCABULARI ---------------- */
+{id:"nombres",bloc:"vocabulari",titol:"Les nombres",mostra:"1 2 3",desc:"Del zéro al million, amb càlculs",afegit:"2026-10-12",tipus:"nombres",
+ consell:"70 = soixante-dix (60+10), 80 = quatre-vingts (4×20), 90 = quatre-vingt-dix. Cent i vingt porten -s quan són múltiples i van al final: deux cents, però deux cent un i deux cent mille. Mille no porta mai -s.",
+ llista:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,30,31,40,50,60,70,71,72,80,81,90,91,99,100,101,200,250,300,500,999,
+  1000,1001,2000,2026,5000,10000,21000,80000,100000,200000,500000,999999,1000000]},
+
+{id:"ordinaux",bloc:"vocabulari",titol:"Els ordinals",mostra:"1er · 2e",desc:"premier, deuxième, troisième…",afegit:"2026-10-12",
+ consell:"Es formen afegint -ième al número: deux → deuxième. Excepcions: premier / première, cinquième (amb u), neuvième (f → v).",
+ items:[{fr:"premier / première",ca:"1r / 1a — primer/a",abbr:"1er"},{fr:"deuxième",ca:"2n — segon",abbr:"2e"},{fr:"troisième",ca:"3r — tercer",abbr:"3e"},
+  {fr:"quatrième",ca:"4t — quart",abbr:"4e"},{fr:"cinquième",ca:"5è — cinquè",abbr:"5e"},{fr:"sixième",ca:"6è — sisè",abbr:"6e"},{fr:"septième",ca:"7è — setè",abbr:"7e"},
+  {fr:"huitième",ca:"8è — vuitè",abbr:"8e"},{fr:"neuvième",ca:"9è — novè",abbr:"9e"},{fr:"dixième",ca:"10è — desè",abbr:"10e"},{fr:"onzième",ca:"11è — onzè",abbr:"11e"},
+  {fr:"vingtième",ca:"20è — vintè",abbr:"20e"}]},
+
+{id:"mois",bloc:"vocabulari",titol:"Els mesos",mostra:"janvier",desc:"De janvier a décembre",afegit:"2026-10-12",ordenat:true,
+ consell:"Els mesos s'escriuen en minúscula: le 12 octobre. Per dir «al gener»: en janvier.",
+ items:[["janvier","gener"],["février","febrer"],["mars","març"],["avril","abril"],["mai","maig"],["juin","juny"],["juillet","juliol"],["août","agost"],
+  ["septembre","setembre"],["octobre","octubre"],["novembre","novembre"],["décembre","desembre"]]},
+
+{id:"jours",bloc:"vocabulari",titol:"Dies de la setmana",mostra:"lundi",desc:"De lundi a dimanche",afegit:"2026-10-12",ordenat:true,
+ consell:"Els dies van en minúscula i la setmana comença per lundi. Lundi = dilluns (aquest dilluns); le lundi = els dilluns (cada dilluns).",
+ items:[["lundi","dilluns"],["mardi","dimarts"],["mercredi","dimecres"],["jeudi","dijous"],["vendredi","divendres"],["samedi","dissabte"],["dimanche","diumenge"]]},
+
+{id:"objets",bloc:"vocabulari",titol:"Objectes de la classe",mostra:"la gomme",desc:"Le stylo, la gomme, le tableau…",afegit:"2026-10-12",
+ consell:"Aprèn cada objecte amb el seu article: le (masculí), la (femení), l' (davant de vocal) i les (plural). El gènere no sempre coincideix amb el català: la gomme, le cahier…",
+ items:[["la salle de classe","l'aula","f"],["le tableau","la pissarra","m"],["le tableau interactif","la pissarra digital","m"],["le bureau","la taula del professor","m"],
+  ["la table","la taula","f"],["la chaise","la cadira","f"],["la fenêtre","la finestra","f"],["la corbeille","la paperera","f"],["la poubelle","el cubell de les escombraries","f"],
+  ["le stylo","el bolígraf","m"],["le crayon","el llapis","m"],["la gomme","la goma","f"],["la règle","el regle","f"],["le feutre","el retolador","m"],
+  ["le taille-crayon","la maquineta","m"],["les ciseaux","les tisores","p"],["la colle","la cola","f"],["la trousse","l'estoig","f"],
+  ["le cahier","la llibreta","m"],["le cahier de textes","l'agenda escolar","m"],["le livre","el llibre","m"],["la feuille","el full","f"],
+  ["le sac à dos","la motxilla","m"],["l'ordinateur","l'ordinador","m"],["la calculatrice","la calculadora","f"]]},
+
+{id:"maison",bloc:"vocabulari",titol:"Objectes de casa",mostra:"un torchon",desc:"Cuina, bany, menjador i habitació",afegit:"2026-10-12",
+ consell:"Aquí els objectes van amb l'article indefinit: un (masculí) o une (femení). Compte: un torchon, un séchoir i un vase són masculins en francès.",
+ estances:{tot:"Tota la casa",cuisine:"La cuisine · cuina",bain:"La salle de bains · bany",salon:"Le salon · menjador i sala",chambre:"La chambre · habitació",divers:"Divers · altres"},
+ items:[
+  ["une planche à découper","una taula de tallar","f","cuisine"],["un couteau","un ganivet","m","cuisine"],["une fourchette","una forquilla","f","cuisine"],
+  ["une cuillère","una cullera","f","cuisine"],["une assiette","un plat","f","cuisine"],["un verre","un got","m","cuisine"],["une tasse","una tassa","f","cuisine"],
+  ["un bol","un bol","m","cuisine"],["une casserole","una olla","f","cuisine"],["une poêle","una paella","f","cuisine"],["une louche","un cullerot","f","cuisine"],
+  ["une passoire","un colador","f","cuisine"],["un torchon","un drap de cuina","m","cuisine"],["un moulin à poivre","un molinet de pebre","m","cuisine"],
+  ["un tire-bouchon","un llevataps","m","cuisine"],["un ouvre-boîte","un obrellaunes","m","cuisine"],["un frigo","una nevera","m","cuisine"],["un four","un forn","m","cuisine"],
+  ["un micro-ondes","un microones","m","cuisine"],["un lave-vaisselle","un rentaplats","m","cuisine"],["un évier","una aigüera","m","cuisine"],
+  ["une bouilloire","un bullidor","f","cuisine"],["une cafetière","una cafetera","f","cuisine"],["un grille-pain","una torradora","m","cuisine"],
+  ["une brosse à dents","un raspall de dents","f","bain"],["un dentifrice","una pasta de dents","m","bain"],["un savon","un sabó","m","bain"],["un shampooing","un xampú","m","bain"],
+  ["une serviette","una tovallola","f","bain"],["un miroir","un mirall","m","bain"],["une douche","una dutxa","f","bain"],["une baignoire","una banyera","f","bain"],
+  ["un lavabo","un rentamans","m","bain"],["un sèche-cheveux","un assecador de cabells","m","bain"],["un peigne","una pinta","m","bain"],
+  ["une brosse à cheveux","un raspall de cabells","f","bain"],["un bandeau pour les cheveux","una cinta per als cabells","m","bain"],["un rasoir","una maquineta d'afaitar","m","bain"],
+  ["un rouleau de papier toilette","un rotlle de paper de vàter","m","bain"],
+  ["une table","una taula","f","salon"],["une chaise","una cadira","f","salon"],["une nappe","unes estovalles","f","salon"],["une serviette de table","un tovalló","f","salon"],
+  ["un vase","un gerro","m","salon"],["un bouquet de fleurs","un ram de flors","m","salon"],["un canapé","un sofà","m","salon"],["un fauteuil","una butaca","m","salon"],
+  ["une télé","una tele","f","salon"],["une télécommande","un comandament a distància","f","salon"],["une lampe","un llum","f","salon"],["un tapis","una catifa","m","salon"],
+  ["une étagère","un prestatge","f","salon"],["un rideau","una cortina","m","salon"],["un coussin","un coixí (de sofà)","m","salon"],["une horloge","un rellotge de paret","f","salon"],
+  ["un ventilateur","un ventilador","m","salon"],
+  ["un lit","un llit","m","chambre"],["un oreiller","un coixí (de llit)","m","chambre"],["un drap","un llençol","m","chambre"],["une couverture","una manta","f","chambre"],
+  ["une couette","un nòrdic","f","chambre"],["une armoire","un armari","f","chambre"],["une commode","una calaixera","f","chambre"],["une table de nuit","una tauleta de nit","f","chambre"],
+  ["une lampe de chevet","un llum de tauleta","f","chambre"],["un réveil","un despertador","m","chambre"],["un cintre","un penjador","m","chambre"],
+  ["un couteau suisse","una navalla suïssa","m","divers"],["une clé USB","una memòria USB","f","divers"],["un séchoir à linge","un estenedor","m","divers"],
+  ["une machine à laver","una rentadora","f","divers"],["un fer à repasser","una planxa","m","divers"],["un aspirateur","una aspiradora","m","divers"],
+  ["un balai","una escombra","m","divers"],["une clé","una clau","f","divers"],["un chargeur","un carregador","m","divers"],["une ampoule","una bombeta","f","divers"],
+  ["un parapluie","un paraigua","m","divers"]]},
+
+/* ---------------- EL MÓN ---------------- */
+{id:"pays",bloc:"mon",titol:"Els països i el seu gènere",mostra:"la France",desc:"le Portugal, la France, les États-Unis",afegit:"2026-10-29",tipus:"pays",
+ consell:"Truc: si el país acaba en -e, gairebé sempre és femení. Davant de vocal l'article és l' i no ens diu el gènere: l'Espagne (f), l'Iran (m).",
+ regla:`<h3>Els països porten article</h3>
+<p>En català diem «França», però en francès el país porta article: «la France», «le Portugal».</p>
+<table><tr><th>Article</th><th>Quan</th><th>Exemples</th></tr>
+<tr><td><b>la</b></td><td>femení</td><td>«la France», «la Belgique», «la Chine»</td></tr>
+<tr><td><b>le</b></td><td>masculí</td><td>«le Portugal», «le Japon», «le Canada»</td></tr>
+<tr><td><b>l'</b></td><td>comença per vocal</td><td>«l'Espagne», «l'Italie», «l'Iran»</td></tr>
+<tr><td><b>les</b></td><td>plural</td><td>«les États-Unis», «les Pays-Bas»</td></tr></table>
+<h3>Com saber el gènere?</h3>
+<ul><li>Acaba en <b>-e</b> → femení: «la Suisse», «la Grèce», «l'Allemagne».</li>
+<li>No acaba en -e → masculí: «le Maroc», «le Brésil», «le Sénégal».</li>
+<li>Excepcions: «le Mexique», «le Cambodge» acaben en -e però són masculins.</li></ul>
+<div class="alerta">Les ciutats no porten article: «Paris», «Barcelone», «Rome». Excepció: «Le Caire», «La Havane».</div>`,
+ paisos:[["France","f","França"],["Espagne","f","Espanya"],["Catalogne","f","Catalunya"],["Italie","f","Itàlia"],["Allemagne","f","Alemanya"],["Belgique","f","Bèlgica"],
+  ["Suisse","f","Suïssa"],["Angleterre","f","Anglaterra"],["Irlande","f","Irlanda"],["Grèce","f","Grècia"],["Pologne","f","Polònia"],["Suède","f","Suècia"],
+  ["Norvège","f","Noruega"],["Roumanie","f","Romania"],["Russie","f","Rússia"],["Ukraine","f","Ucraïna"],["Turquie","f","Turquia"],["Chine","f","la Xina"],
+  ["Inde","f","l'Índia"],["Australie","f","Austràlia"],["Argentine","f","l'Argentina"],["Colombie","f","Colòmbia"],["Algérie","f","Algèria"],["Tunisie","f","Tunísia"],
+  ["Égypte","f","Egipte"],
+  ["Portugal","m","Portugal"],["Maroc","m","el Marroc"],["Canada","m","el Canadà"],["Japon","m","el Japó"],["Brésil","m","el Brasil"],["Mexique","m","Mèxic"],
+  ["Sénégal","m","el Senegal"],["Pérou","m","el Perú"],["Chili","m","Xile"],["Danemark","m","Dinamarca"],["Cambodge","m","Cambodja"],["Royaume-Uni","m","el Regne Unit"],
+  ["Venezuela","m","Veneçuela"],["Vietnam","m","el Vietnam"],["Luxembourg","m","Luxemburg"],["Pakistan","m","el Pakistan"],["Cameroun","m","el Camerun"],
+  ["Québec","m","el Quebec"],["Mali","m","Mali"],["Iran","m","l'Iran"],["Irak","m","l'Iraq"],
+  ["États-Unis","p","els Estats Units"],["Pays-Bas","p","els Països Baixos"],["Philippines","p","les Filipines"],["Émirats arabes unis","p","els Emirats Àrabs Units"]]},
+
+{id:"villes",bloc:"mon",titol:"Països, ciutats i preposicions",mostra:"à · en · au",desc:"à Paris, en France, au Japon, aux États-Unis",afegit:"2026-10-29",tipus:"villes",
+ consell:"La mateixa preposició serveix per dir on ets i on vas: J'habite en France · Je vais en France.",
+ regla:`<h3>On vius? On vas?</h3>
+<table><tr><th>Lloc</th><th>Preposició</th><th>Exemples</th></tr>
+<tr><td>Ciutat</td><td><b>à</b></td><td>«à Paris», «à Barcelone»</td></tr>
+<tr><td>País femení</td><td><b>en</b></td><td>«en France», «en Espagne»</td></tr>
+<tr><td>País masculí que comença per vocal</td><td><b>en</b></td><td>«en Iran», «en Irak»</td></tr>
+<tr><td>País masculí</td><td><b>au</b> (à + le)</td><td>«au Portugal», «au Japon»</td></tr>
+<tr><td>País plural</td><td><b>aux</b> (à + les)</td><td>«aux États-Unis»</td></tr></table>
+<h3>D'on vens?</h3>
+<table><tr><th>Lloc</th><th>Preposició</th><th>Exemples</th></tr>
+<tr><td>Ciutat</td><td><b>de</b> / <b>d'</b></td><td>«de Paris», «d'Athènes»</td></tr>
+<tr><td>País femení</td><td><b>de</b> / <b>d'</b></td><td>«de France», «d'Italie»</td></tr>
+<tr><td>País masculí</td><td><b>du</b> (de + le)</td><td>«du Maroc», «du Canada»</td></tr>
+<tr><td>País plural</td><td><b>des</b> (de + les)</td><td>«des États-Unis»</td></tr></table>
+<div class="alerta">Davant de vocal, <b>de</b> es converteix en <b>d'</b>: «Je viens d'Espagne», «Il est d'Iran».</div>`,
+ villesLlista:[["Paris","París"],["Barcelone","Barcelona"],["Gérone","Girona"],["Tarragone","Tarragona"],["Lérida","Lleida"],["Perpignan","Perpinyà"],
+  ["Madrid","Madrid"],["Lisbonne","Lisboa"],["Londres","Londres"],["Rome","Roma"],["Berlin","Berlín"],["Bruxelles","Brussel·les"],["Genève","Ginebra"],
+  ["Marseille","Marsella"],["Lyon","Lió"],["Toulouse","Tolosa"],["Montréal","Mont-real"],["New York","Nova York"],["Pékin","Pequín"],["Tokyo","Tòquio"],
+  ["Athènes","Atenes"],["Amsterdam","Amsterdam"],["Venise","Venècia"],["Moscou","Moscou"],["Dakar","Dakar"],
+  {nom:"Le Caire",ca:"el Caire",base:"Caire",a:"au",de:"du"}]},
+
+{id:"nationalites",bloc:"mon",titol:"Les nacionalitats",mostra:"-ais · -aise",desc:"espagnol / espagnole: masculí i femení",afegit:"2026-10-29",tipus:"nationalites",
+ consell:"Les nacionalitats s'escriuen en minúscula: il est français. El femení sol afegir -e (espagnol → espagnole); -ien fa -ienne (italien → italienne).",
+ nacio:[["espagnol","espagnole","espanyol / espanyola","l'Espagne"],["catalan","catalane","català / catalana","la Catalogne"],["français","française","francès / francesa","la France"],
+  ["anglais","anglaise","anglès / anglesa","l'Angleterre"],["allemand","allemande","alemany / alemanya","l'Allemagne"],["italien","italienne","italià / italiana","l'Italie"],
+  ["portugais","portugaise","portuguès / portuguesa","le Portugal"],["belge","belge","belga","la Belgique"],["suisse","suisse","suís / suïssa","la Suisse"],
+  ["marocain","marocaine","marroquí / marroquina","le Maroc"],["chinois","chinoise","xinès / xinesa","la Chine"],["japonais","japonaise","japonès / japonesa","le Japon"],
+  ["américain","américaine","nord-americà / nord-americana","les États-Unis"],["canadien","canadienne","canadenc / canadenca","le Canada"],
+  ["mexicain","mexicaine","mexicà / mexicana","le Mexique"],["brésilien","brésilienne","brasiler / brasilera","le Brésil"],["argentin","argentine","argentí / argentina","l'Argentine"],
+  ["russe","russe","rus / russa","la Russie"],["grec","grecque","grec / grega","la Grèce"],["roumain","roumaine","romanès / romanesa","la Roumanie"],
+  ["sénégalais","sénégalaise","senegalès / senegalesa","le Sénégal"]]},
+
+/* ---------------- GRAMÀTICA ---------------- */
+{id:"articles",bloc:"gramatica",titol:"Els articles",mostra:"le · un",desc:"le, la, l', les · un, une, des",afegit:"2026-10-29",tipus:"articles",
+ consell:"Quan en català no posem article («Hi ha llibres»), en francès sovint cal des: Il y a des livres.",
+ regla:`<h3>Articles definits: le, la, l', les</h3>
+<p>Per a una cosa concreta o coneguda, i per parlar de gustos en general.</p>
+<table><tr><th></th><th>Singular</th><th>Plural</th></tr>
+<tr><td>Masculí</td><td>«le livre»</td><td rowspan="2">«les livres», «les tables»</td></tr>
+<tr><td>Femení</td><td>«la table»</td></tr>
+<tr><td>Davant de vocal</td><td>«l'école», «l'ami»</td><td>«les écoles»</td></tr></table>
+<p>«Le chat de Paul est noir.» «J'aime la musique.»</p>
+<h3>Articles indefinits: un, une, des</h3>
+<p>Per a una cosa qualsevol, o quan en parlem per primer cop.</p>
+<table><tr><th></th><th>Singular</th><th>Plural</th></tr>
+<tr><td>Masculí</td><td>«un livre»</td><td rowspan="2">«des livres», «des tables»</td></tr>
+<tr><td>Femení</td><td>«une table»</td></tr></table>
+<p>«J'ai un chat.» «Il y a des chaises dans la classe.»</p>
+<div class="alerta">En francès el nom gairebé mai va sol. On el català no posa res, el francès posa <b>des</b>: «Hi ha cadires» → «Il y a des chaises».</div>
+<h3>Els idiomes</h3>
+<p>Porten article quan els estudies o t'agraden: «J'étudie le français.» Amb «parler» sovint no: «Je parle français.»</p>`,
+ frases:[
+  ["J'ai ___ chat.","un",["un","une","le","des"],"Tinc un gat.","un gat qualsevol, en parlem per primer cop → un"],
+  ["___ chat de Paul est noir.","Le",["Le","La","Un","Les"],"El gat d'en Paul és negre.","un gat concret, el d'en Paul → le"],
+  ["C'est ___ gomme.","une",["un","une","la","des"],"És una goma.","gomme és femení → une"],
+  ["___ gomme de Léa est rose.","La",["Le","La","Une","L'"],"La goma de la Léa és rosa.","una goma concreta → la"],
+  ["Il y a ___ livres sur la table.","des",["des","les","un","une"],"Hi ha llibres a la taula.","en català sense article; en francès cal des"],
+  ["___ livres de français sont nouveaux.","Les",["Les","Des","Le","La"],"Els llibres de francès són nous.","uns llibres concrets → les"],
+  ["J'aime ___ musique.","la",["la","une","le","des"],"M'agrada la música.","gustos en general → article definit"],
+  ["Elle adore ___ chocolat.","le",["le","un","la","des"],"Li encanta la xocolata.","chocolat és masculí en francès"],
+  ["Tu as ___ ordinateur ?","un",["un","une","l'","des"],"Tens ordinador?","en català sovint sense article; en francès un"],
+  ["___ ordinateur de la classe est vieux.","L'",["L'","Le","La","Un"],"L'ordinador de la classe és vell.","davant de vocal → l'"],
+  ["J'habite dans ___ petite ville.","une",["un","une","la","des"],"Visc en una ciutat petita.","ville és femení → une"],
+  ["___ école est grande.","L'",["L'","La","Le","Une"],"L'escola és gran.","école comença per vocal → l'"],
+  ["___ soleil est jaune.","Le",["Le","La","Un","L'"],"El sol és groc.","només n'hi ha un → le"],
+  ["Il y a ___ chaises dans la classe.","des",["des","les","une","la"],"Hi ha cadires a la classe.","plural indefinit → des"],
+  ["J'étudie ___ français.","le",["le","la","un","les"],"Estudio francès.","les llengües porten article: le français"],
+  ["Je mange ___ pomme.","une",["un","une","la","des"],"Menjo una poma.","pomme és femení → une"],
+  ["___ pommes sont dans le frigo.","Les",["Les","Des","La","Le"],"Les pomes són a la nevera.","unes pomes concretes → les"],
+  ["C'est ___ histoire très drôle.","une",["un","une","l'","la"],"És una història molt divertida.","histoire és femení → une"],
+  ["Les enfants aiment ___ animaux.","les",["les","des","la","le"],"Als nens els agraden els animals.","gustos en general → les"]]},
+
+{id:"possessifs",bloc:"gramatica",titol:"Els possessius",mostra:"mon · ma",desc:"mon, ma, mes · ton, ta, tes…",afegit:"2026-10-29",
+ consell:"El possessiu concorda amb la cosa posseïda, no amb qui la té: Marie aime son chat (chat és masculí).",
+ regla:`<h3>Els possessius</h3>
+<div class="tablewrap"><table><tr><th>De qui és?</th><th>Masculí</th><th>Femení</th><th>Plural</th></tr>
+<tr><td>à moi (meu)</td><td>«mon livre»</td><td>«ma trousse»</td><td>«mes crayons»</td></tr>
+<tr><td>à toi (teu)</td><td>«ton livre»</td><td>«ta trousse»</td><td>«tes crayons»</td></tr>
+<tr><td>à lui / à elle (seu)</td><td>«son livre»</td><td>«sa trousse»</td><td>«ses crayons»</td></tr>
+<tr><td>à nous (nostre)</td><td colspan="2">«notre classe»</td><td>«nos livres»</td></tr>
+<tr><td>à vous (vostre)</td><td colspan="2">«votre classe»</td><td>«vos livres»</td></tr>
+<tr><td>à eux / à elles (seu)</td><td colspan="2">«leur classe»</td><td>«leurs livres»</td></tr></table></div>
+<h3>Dues regles importants</h3>
+<ul><li>Concorda amb la cosa, no amb la persona: «Paul aime sa mère» (mère és femení). «Marie aime son chat» (chat és masculí).</li>
+<li>Davant d'una paraula femenina que comença per vocal, fem servir <b>mon, ton, son</b>: «mon amie», «ton école», «son adresse».</li></ul>
+<div class="alerta">En francès el possessiu no porta article davant: «el meu llibre» → «mon livre».</div>`,
+ frases:[
+  ["C'est ___ livre. (à moi)","mon",["mon","ma","mes","ton"],"És el meu llibre.","livre és masculí singular → mon"],
+  ["C'est ___ trousse. (à moi)","ma",["mon","ma","mes","ta"],"És el meu estoig.","trousse és femení → ma"],
+  ["Ce sont ___ crayons. (à moi)","mes",["mon","ma","mes","tes"],"Són els meus llapis.","crayons és plural → mes"],
+  ["C'est ___ école. (à moi)","mon",["mon","ma","mes","ton"],"És la meva escola.","école és femení però comença per vocal → mon"],
+  ["Tu as ___ cahier ? (à toi)","ton",["ton","ta","tes","mon"],"Tens la teva llibreta?","cahier és masculí → ton"],
+  ["Où est ___ gomme ? (à toi)","ta",["ton","ta","tes","sa"],"On és la teva goma?","gomme és femení → ta"],
+  ["Voici ___ parents. (à toi)","tes",["ton","ta","tes","ses"],"Aquí tens els teus pares.","parents és plural → tes"],
+  ["Paul habite avec ___ mère.","sa",["son","sa","ses","leur"],"En Paul viu amb la seva mare.","mère és femení → sa (concorda amb la mare, no amb en Paul)"],
+  ["Marie adore ___ chat.","son",["son","sa","ses","ma"],"La Marie adora el seu gat.","chat és masculí → son, encara que la Marie sigui una noia"],
+  ["Julie range ___ affaires.","ses",["son","sa","ses","leurs"],"La Julie endreça les seves coses.","affaires és plural → ses"],
+  ["Léa cherche ___ adresse.","son",["son","sa","ses","leur"],"La Léa busca la seva adreça.","adresse és femení però comença per vocal → son"],
+  ["C'est ___ classe. (à nous)","notre",["notre","nos","votre","leur"],"És la nostra classe.","una cosa nostra → notre"],
+  ["Ce sont ___ professeurs. (à nous)","nos",["notre","nos","vos","leurs"],"Són els nostres professors.","diverses coses nostres → nos"],
+  ["C'est ___ maison ? (à vous)","votre",["votre","vos","notre","leur"],"És casa vostra?","una cosa vostra → votre"],
+  ["Ce sont ___ livres ? (à vous)","vos",["votre","vos","nos","leurs"],"Són els vostres llibres?","diverses coses vostres → vos"],
+  ["Ils aiment ___ ville.","leur",["leur","leurs","son","sa"],"Els agrada la seva ciutat.","diversos posseïdors, una cosa → leur"],
+  ["Elles parlent avec ___ amis.","leurs",["leur","leurs","ses","son"],"Parlen amb els seus amics.","diversos posseïdors, diverses coses → leurs"],
+  ["C'est ___ amie Laia. (à moi)","mon",["mon","ma","mes","ton"],"És la meva amiga Laia.","amie comença per vocal → mon"],
+  ["Tu connais ___ frère ? (à moi)","mon",["mon","ma","mes","son"],"Coneixes el meu germà?","frère és masculí → mon"],
+  ["Les élèves ouvrent ___ cahiers.","leurs",["leur","leurs","ses","nos"],"Els alumnes obren les seves llibretes.","diversos posseïdors, diverses coses → leurs"]]},
+
+{id:"verbes",bloc:"gramatica",titol:"Verbs en present",mostra:"je suis",desc:"être, avoir, aller, faire, habiter, parler…",afegit:"2026-10-29",tipus:"verbes",
+ consell:"En els verbs en -er, les terminacions -e, -es i -ent no es pronuncien: je parle, tu parles, ils parlent sonen igual.",
+ regla:`<h3>Els pronoms</h3>
+<table><tr><td>«je» (j' davant de vocal)</td><td>jo</td><td>«nous»</td><td>nosaltres</td></tr>
+<tr><td>«tu»</td><td>tu</td><td>«vous»</td><td>vosaltres / vostè</td></tr>
+<tr><td>«il», «elle»</td><td>ell, ella</td><td>«ils», «elles»</td><td>ells, elles</td></tr></table>
+<p>En francès el pronom és obligatori: parlo → «je parle».</p>
+<h3>Verbs en -er (regulars)</h3>
+<p>Terminacions: -e, -es, -e, -ons, -ez, -ent. Així funcionen «habiter», «parler», «aimer» i «écouter».</p>
+<div class="alerta">«s'appeler» dobla la l quan la síl·laba no es pronuncia: «je m'appelle», però «nous nous appelons».</div>
+<h3>Les taules</h3>`,
+ verbs:[
+  {inf:"être",ca:"ser / estar",f:["suis","es","est","sommes","êtes","sont"],c:["sóc","ets","és","som","sou","són"]},
+  {inf:"avoir",ca:"tenir",f:["ai","as","a","avons","avez","ont"],c:["tinc","tens","té","tenim","teniu","tenen"]},
+  {inf:"aller",ca:"anar",f:["vais","vas","va","allons","allez","vont"],c:["vaig","vas","va","anem","aneu","van"]},
+  {inf:"faire",ca:"fer",f:["fais","fais","fait","faisons","faites","font"],c:["faig","fas","fa","fem","feu","fan"]},
+  {inf:"venir",ca:"venir",f:["viens","viens","vient","venons","venez","viennent"],c:["vinc","vens","ve","venim","veniu","venen"]},
+  {inf:"s'appeler",ca:"dir-se",f:["m'appelle","t'appelles","s'appelle","nous appelons","vous appelez","s'appellent"],c:["em dic","et dius","es diu","ens diem","us dieu","es diuen"]},
+  {inf:"habiter",ca:"viure (a un lloc)",f:["habite","habites","habite","habitons","habitez","habitent"],c:["visc","vius","viu","vivim","viviu","viuen"]},
+  {inf:"parler",ca:"parlar",f:["parle","parles","parle","parlons","parlez","parlent"],c:["parlo","parles","parla","parlem","parleu","parlen"]},
+  {inf:"aimer",ca:"agradar / estimar",f:["aime","aimes","aime","aimons","aimez","aiment"],c:["m'agrada","t'agrada","li agrada","ens agrada","us agrada","els agrada"]},
+  {inf:"écouter",ca:"escoltar",f:["écoute","écoutes","écoute","écoutons","écoutez","écoutent"],c:["escolto","escoltes","escolta","escoltem","escolteu","escolten"]}],
+ frases:[
+  ["Je ___ catalan et espagnol. (parler)","parle","parler","Parlo català i castellà."],
+  ["Nous ___ à Barcelone. (habiter)","habitons","habiter","Vivim a Barcelona."],
+  ["Comment tu ___ ? (s'appeler)","t'appelles","s'appeler","Com et dius?"],
+  ["Elle ___ douze ans. (avoir)","a","avoir","Té dotze anys.","en francès l'edat es diu amb avoir"],
+  ["Vous ___ français ? (être)","êtes","être","Sou francesos?"],
+  ["Ils ___ au collège à pied. (aller)","vont","aller","Van a l'institut a peu."],
+  ["Je ___ du sport le samedi. (faire)","fais","faire","Faig esport els dissabtes."],
+  ["Tu ___ d'où ? (venir)","viens","venir","D'on vens?"],
+  ["Mes parents ___ la musique. (aimer)","aiment","aimer","Als meus pares els agrada la música."],
+  ["Nous ___ la radio. (écouter)","écoutons","écouter","Escoltem la ràdio."],
+  ["J'___ en Catalogne. (habiter)","habite","habiter","Visc a Catalunya."],
+  ["Vous ___ quoi ce week-end ? (faire)","faites","faire","Què feu aquest cap de setmana?"],
+  ["Mon frère et moi, nous ___ catalans. (être)","sommes","être","El meu germà i jo som catalans."],
+  ["Le professeur ___ Monsieur Martin. (s'appeler)","s'appelle","s'appeler","El professor es diu senyor Martin."],
+  ["Tu ___ un stylo ? (avoir)","as","avoir","Tens un bolígraf?"],
+  ["Ils ___ du Maroc. (venir)","viennent","venir","Vénen del Marroc."],
+  ["Elles ___ anglais et français. (parler)","parlent","parler","Parlen anglès i francès."],
+  ["Je ___ en classe. (être)","suis","être","Sóc a classe."],
+  ["Nous ___ un chat et un chien. (avoir)","avons","avoir","Tenim un gat i un gos."],
+  ["Tu ___ au cinéma ce soir ? (aller)","vas","aller","Vas al cinema aquest vespre?"]]}
+];
+</script>
+
+<script>
+/* ======================================================================
+   MOTOR DEL CAHIER (no cal tocar-lo per afegir continguts)
+   ====================================================================== */
+const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+const $=s=>document.querySelector(s);
+const rnd=n=>Math.floor(Math.random()*n);
+const any=a=>a[rnd(a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const uniq=a=>[...new Set(a)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’']/g,"'").replace(/[?!.,;:—]/g,"").replace(/-/g," ").replace(/\s+/g," ").trim();
+const snorm=s=>norm(s).replace(/^(les|le|la|l'|une|un|des) ?/,"").trim();
+const spoken=fr=>fr.split(" / ")[0];
+const clean=s=>s.replace(/\s*\([^)]*\)/g,"").replace(/\s+([.?!])/g," $1").replace(/ \./g,".").trim();
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+function fill(s,a){return s.replace(/(['’])\s?___/,"$1"+a).replace(/___\s?/,m=>a.endsWith("'")?a:a+(m.endsWith(" ")?" ":""))}
+function lev(a,b){const m=a.length,n=b.length;if(!m||!n)return Math.max(m,n);let p=[...Array(n+1).keys()];
+  for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+const VOC=/^[AEIOUÉÈÊÎaeiouéèêî]/;
+const rich=html=>html.replace(/«([^»]+)»/g,(m,t)=>`<span class="ex" data-say="${esc(t.replace(/<[^>]+>/g,""))}" role="button" tabindex="0">${t}</span>`);
+
+/* ---------- numbers 0 – 1 000 000 ---------- */
 const U=["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize"];
 const TENS={2:"vingt",3:"trente",4:"quarante",5:"cinquante",6:"soixante"};
 function b100(n,fin){if(n<17)return U[n];if(n<20)return "dix-"+U[n-10];const t=Math.floor(n/10),r=n%10;
@@ -122,315 +523,316 @@ function b1000(n,fin){const h=Math.floor(n/100),r=n%100;if(!h)return b100(r,fin)
 function frNum(n){if(n===0)return "zéro";if(n===1e6)return "un million";const th=Math.floor(n/1000),r=n%1000;
   const ts=!th?"":th===1?"mille":b1000(th,false)+" mille";return [ts,r?b1000(r,true):""].filter(Boolean).join(" ")}
 const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ");
-function numItem(n){return {fr:frNum(n),ca:fmt(n),n}}
+const numItem=n=>({fr:frNum(n),ca:fmt(n),n});
 function randNum(){const k=rnd(4);return k===0?rnd(101):k===1?100+rnd(900):k===2?1000+rnd(99000):rnd(4)?1000*(1+rnd(999)):(rnd(10)?100000+rnd(900000):1000000)}
 function nearNums(n,count){const set=new Set([n]),mag=n<20?3:n<100?10:n<1000?100:n<100000?1000:100000;let g=0;
   while(set.size<count+1&&g++<200){const c=n+(rnd(2)?1:-1)*(1+rnd(4))*(rnd(3)?mag:Math.max(1,mag/10));if(c>=0&&c<=1e6)set.add(c)}
   while(set.size<count+1)set.add(rnd(1001));set.delete(n);return [...set].slice(0,count)}
-/* question pickers: numbers mix the fixed list with random numbers up to a million */
-function pick(){if(theme==="nombres"&&rnd(2))return numItem(randNum());return items()[rnd(items().length)]}
-function distract(it){if(theme==="nombres")return nearNums(it.n,3).map(numItem);return shuffle(items().filter(x=>x.fr!==it.fr)).slice(0,3)}
 
-const THEMES={
-  nombres:{name:"Les nombres",tip:"70 = soixante-dix (60+10), 80 = quatre-vingts (4×20), 90 = quatre-vingt-dix. Cent i vingt només porten -s quan són múltiples i van al final: deux cents, però deux cent un i deux cent mille. Mille no porta mai -s. Un million.",
-    items:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,30,31,40,50,60,70,71,72,80,81,90,91,99,100,101,200,250,300,500,999,
-      1000,1001,2000,2026,5000,10000,21000,80000,100000,200000,500000,999999,1000000].map(numItem)},
-  ordinaux:{name:"Els ordinals",tip:"Es formen afegint -ième al número: deux → deuxième. Excepcions: premier / première, cinquième (amb u), neuvième (f → v).",
-    items:[["premier / première","1r / 1a — primer/a","1er"],["deuxième","2n — segon","2e"],["troisième","3r — tercer","3e"],["quatrième","4t — quart","4e"],
-      ["cinquième","5è — cinquè","5e"],["sixième","6è — sisè","6e"],["septième","7è — setè","7e"],["huitième","8è — vuitè","8e"],
-      ["neuvième","9è — novè","9e"],["dixième","10è — desè","10e"],["onzième","11è — onzè","11e"],["vingtième","20è — vintè","20e"]]
-      .map(([fr,ca,abbr])=>({fr,ca,abbr}))},
-  objets:{name:"Objectes de la classe",tip:"Aprèn cada objecte amb el seu article: le (masculí), la (femení), l' (davant de vocal) i les (plural). El gènere no sempre coincideix amb el català: la gomme, le cahier…",
-    items:[["la salle de classe","l'aula","f"],["le tableau","la pissarra","m"],["le tableau interactif","la pissarra digital","m"],["le bureau","la taula del professor","m"],
-      ["la table","la taula","f"],["la chaise","la cadira","f"],["la fenêtre","la finestra","f"],["la corbeille","la paperera","f"],["la poubelle","el cubell de les escombraries","f"],
-      ["le stylo","el bolígraf","m"],["le crayon","el llapis","m"],["la gomme","la goma","f"],["la règle","el regle","f"],["le feutre","el retolador","m"],
-      ["le taille-crayon","la maquineta","m"],["les ciseaux","les tisores","p"],["la colle","la cola","f"],["la trousse","l'estoig","f"],
-      ["le cahier","la llibreta","m"],["le cahier de textes","l'agenda escolar","m"],["le livre","el llibre","m"],["la feuille","el full","f"],
-      ["le sac à dos","la motxilla","m"],["l'ordinateur","l'ordinador","m"],["la calculatrice","la calculadora","f"]]
-      .map(([fr,ca,g])=>({fr,ca,g}))},
-  maison:{name:"Objectes de casa",tip:"Aquí els objectes van amb l'article indefinit: un (masculí) o une (femení). Compte: un torchon, un séchoir i un vase són masculins en francès.",
-    rooms:{tot:"Tota la casa",cuisine:"La cuisine · cuina",bain:"La salle de bains · bany",salon:"Le salon · menjador i sala",chambre:"La chambre · habitació",divers:"Divers · altres"},
-    items:`cuisine|une planche à découper|una taula de tallar|f
-cuisine|un couteau|un ganivet|m
-cuisine|une fourchette|una forquilla|f
-cuisine|une cuillère|una cullera|f
-cuisine|une assiette|un plat|f
-cuisine|un verre|un got|m
-cuisine|une tasse|una tassa|f
-cuisine|un bol|un bol|m
-cuisine|une casserole|una olla|f
-cuisine|une poêle|una paella|f
-cuisine|une louche|un cullerot|f
-cuisine|une passoire|un colador|f
-cuisine|un torchon|un drap de cuina|m
-cuisine|un moulin à poivre|un molinet de pebre|m
-cuisine|un tire-bouchon|un llevataps|m
-cuisine|un ouvre-boîte|un obrellaunes|m
-cuisine|un frigo|una nevera|m
-cuisine|un four|un forn|m
-cuisine|un micro-ondes|un microones|m
-cuisine|un lave-vaisselle|un rentaplats|m
-cuisine|un évier|una aigüera|m
-cuisine|une bouilloire|un bullidor|f
-cuisine|une cafetière|una cafetera|f
-cuisine|un grille-pain|una torradora|m
-bain|une brosse à dents|un raspall de dents|f
-bain|un dentifrice|una pasta de dents|m
-bain|un savon|un sabó|m
-bain|un shampooing|un xampú|m
-bain|une serviette|una tovallola|f
-bain|un miroir|un mirall|m
-bain|une douche|una dutxa|f
-bain|une baignoire|una banyera|f
-bain|un lavabo|un rentamans|m
-bain|un sèche-cheveux|un assecador de cabells|m
-bain|un peigne|una pinta|m
-bain|une brosse à cheveux|un raspall de cabells|f
-bain|un bandeau pour les cheveux|una cinta per als cabells|m
-bain|un rasoir|una maquineta d'afaitar|m
-bain|un rouleau de papier toilette|un rotlle de paper de vàter|m
-salon|une table|una taula|f
-salon|une chaise|una cadira|f
-salon|une nappe|unes estovalles|f
-salon|une serviette de table|un tovalló|f
-salon|un vase|un gerro|m
-salon|un bouquet de fleurs|un ram de flors|m
-salon|un canapé|un sofà|m
-salon|un fauteuil|una butaca|m
-salon|une télé|una tele|f
-salon|une télécommande|un comandament a distància|f
-salon|une lampe|un llum|f
-salon|un tapis|una catifa|m
-salon|une étagère|un prestatge|f
-salon|un rideau|una cortina|m
-salon|un coussin|un coixí (de sofà)|m
-salon|une horloge|un rellotge de paret|f
-salon|un ventilateur|un ventilador|m
-chambre|un lit|un llit|m
-chambre|un oreiller|un coixí (de llit)|m
-chambre|un drap|un llençol|m
-chambre|une couverture|una manta|f
-chambre|une couette|un nòrdic|f
-chambre|une armoire|un armari|f
-chambre|une commode|una calaixera|f
-chambre|une table de nuit|una tauleta de nit|f
-chambre|une lampe de chevet|un llum de tauleta|f
-chambre|un réveil|un despertador|m
-chambre|un cintre|un penjador|m
-divers|un couteau suisse|una navalla suïssa|m
-divers|une clé USB|una memòria USB|f
-divers|un séchoir à linge|un estenedor|m
-divers|une machine à laver|una rentadora|f
-divers|un fer à repasser|una planxa|m
-divers|un aspirateur|una aspiradora|m
-divers|un balai|una escombra|m
-divers|une clé|una clau|f
-divers|un chargeur|un carregador|m
-divers|une ampoule|una bombeta|f
-divers|un parapluie|un paraigua|m`.split("\n").map(l=>{const [r,fr,ca,g]=l.split("|");return {fr,ca,g,r}})},
-  mois:{name:"Els mesos",tip:"En francès els mesos s'escriuen en minúscula: le 12 octobre. Per dir «al gener»: en janvier.",
-    items:["janvier gener","février febrer","mars març","avril abril","mai maig","juin juny","juillet juliol","août agost","septembre setembre","octobre octubre","novembre novembre","décembre desembre"]
-      .map((s,i)=>{const [fr,ca]=s.split(" ");return {fr,ca,n:i+1}})},
-  jours:{name:"Dies de la setmana",tip:"Els dies també van en minúscula i la setmana comença per lundi. Lundi = dilluns (aquest dilluns); le lundi = els dilluns (cada dilluns).",
-    items:["lundi dilluns","mardi dimarts","mercredi dimecres","jeudi dijous","vendredi divendres","samedi dissabte","dimanche diumenge"]
-      .map((s,i)=>{const [fr,ca]=s.split(" ");return {fr,ca,n:i+1}})},
-  salut:{name:"Salutacions",tip:"Bonjour serveix tot el dia; bonsoir, a partir del vespre. Salut és informal, entre amics.",
-    items:[["Bonjour","Bon dia / Hola"],["Bonsoir","Bona tarda (vespre)"],["Salut","Hola (informal)"],["Au revoir","Adéu"],["À bientôt","Fins aviat"],
-      ["À demain","Fins demà"],["Bonne nuit","Bona nit"],["Comment ça va ?","Com va?"],["Ça va bien, merci","Va bé, gràcies"],
-      ["Comment tu t'appelles ?","Com et dius?"],["Je m'appelle Joan","Em dic Joan"],["Enchanté / Enchantée","Encantat / Encantada"],
-      ["S'il te plaît","Si us plau"],["Merci","Gràcies"],["De rien","De res"]]
-      .map(([fr,ca])=>({fr,ca}))}
+/* ---------- builders: turn compact content into items / sentences ---------- */
+const normItem=x=>Array.isArray(x)?{fr:x[0],ca:x[1],g:x[2]||undefined,r:x[3]}:x;
+const normFrase=x=>{if(!Array.isArray(x))return x;const [s,a,o,ca,why]=x;return {s,a,o,ca,why}};
+function caA(ca){return ca.startsWith("el ")?"al "+ca.slice(3):ca.startsWith("els ")?"als "+ca.slice(4):"a "+ca}
+function caDe(ca){return ca.startsWith("el ")?"del "+ca.slice(3):ca.startsWith("els ")?"dels "+ca.slice(4):/^(la |les |l')/.test(ca)?"de "+ca:/^[AEIOUÀÈÉÍÒÓÚaeiou]/.test(ca)?"d'"+ca:"de "+ca}
+function paysItem([base,g,ca]){const art=g==="p"?"les":VOC.test(base)?"l'":g==="f"?"la":"le";
+  return {fr:(art==="l'"?"l'":art+" ")+base,base,art,g,ca}}
+function prepA(p){return p.g==="p"?"aux":(p.g==="f"||VOC.test(p.base))?"en":"au"}
+function prepDe(p){return p.g==="p"?"des":VOC.test(p.base)?"d'":p.g==="f"?"de":"du"}
+function whyA(p){return p.g==="p"?"país plural → aux (à + les)":p.g==="f"?"país femení → en":VOC.test(p.base)?"país masculí que comença per vocal → en":"país masculí → au (à + le)"}
+function whyDe(p){return p.g==="p"?"país plural → des (de + les)":p.g==="m"&&!VOC.test(p.base)?"país masculí → du (de + le)":VOC.test(p.base)?"comença per vocal → d'":"país femení → de"}
+const PRON=["je","tu","il","nous","vous","ils"],PRONF=["je","tu","elle","nous","vous","elles"];
+const CAPR=["(jo)","(tu)","(ell)","(nosaltres)","(vosaltres)","(ells)"],CAPRF=["(jo)","(tu)","(ella)","(nosaltres)","(vosaltres)","(elles)"];
+function conj(pron,form){return pron==="je"&&/^[aeiouéèêh]/.test(form)?"j'"+form:pron+" "+form}
+
+const BUILD={
+  nombres(t){t.items=t.llista.map(numItem);t.genItem=()=>numItem(randNum());t.distract=it=>nearNums(it.n,3).map(numItem)},
+  pays(t){t.items=t.paisos.map(paysItem);
+    t.acts=["regla","vocab","cartes","article","quiz","escolta","parelles","escriu","parla"]},
+  villes(t){const P=TEMES.find(x=>x.id==="pays").paisos.map(paysItem);
+    const V=t.villesLlista.map(v=>Array.isArray(v)?{nom:v[0],ca:v[1],base:v[0],a:"à",de:VOC.test(v[0])?"d'":"de"}:v);
+    const IN=[["J'habite ___ X.","Visc Y."],["Je vais ___ X.","Vaig Y."],["Nous allons ___ X.","Anem Y."],["Elle travaille ___ X.","Treballa Y."],["Tu es ___ X ?","Ets Y?"]];
+    const DE=[["Je viens ___ X.","Vinc Y."],["Il est ___ X.","És Y."],["Ils arrivent ___ X.","Arriben Y."],["Elle rentre ___ X.","Torna Y."]];
+    t.genFrase=()=>{const from=rnd(3)===0,tpl=any(from?DE:IN);
+      if(rnd(3)===0){const v=any(V);const a=from?v.de:v.a;
+        return {s:tpl[0].replace("X",v.base),a,o:from?["de","d'","du","des"]:["à","en","au","aux"],ca:tpl[1].replace("Y",from?caDe(v.ca):caA(v.ca)),
+          why:v.base!==v.nom?`${v.nom}: ciutat amb article → ${a}`:from?(a==="d'"?"ciutat que comença per vocal → d'":"ciutat → de"):"ciutat → à"}}
+      const p=any(P);const a=from?prepDe(p):prepA(p);
+      return {s:tpl[0].replace("X",p.base),a,o:from?["de","d'","du","des"]:["à","en","au","aux"],ca:tpl[1].replace("Y",from?caDe(p.ca):caA(p.ca)),
+        why:`${p.fr} · `+(from?whyDe(p):whyA(p))}};
+    t.acts=["regla","buits","escriuB","cartes","ordena","parla"]},
+  nationalites(t){t.items=t.nacio.map(([m,f,ca])=>({fr:m===f?m:m+" / "+f,ca}));
+    const NM=["Paul","Marc","Jordi","Hugo"],NF=["Marie","Léa","Laia","Emma"];
+    const pl=w=>/[sx]$/.test(w)?w:w+"s";
+    t.genFrase=()=>{const n=any(t.nacio.filter(x=>x[0]!==x[1]));const [m,f,ca,pays]=n;const cs=ca.split(" / ");const k=rnd(4);
+      if(k===3){const fem=rnd(2);const a=fem?pl(f):pl(m);
+        return {s:`${fem?"Elles":"Ils"} sont ___. (${pays})`,a,o:uniq([pl(m),pl(f),m,f]),ca:`${fem?"Elles":"Ells"} són de ${pays}.`,why:`plural ${fem?"femení":"masculí"} → ${a}`}}
+      const fem=k%2===1,nom=any(fem?NF:NM),a=fem?f:m;
+      return {s:`${nom} est ___. (${pays})`,a,o:[m,f],ca:`${nom} és ${fem?cs[1]:cs[0]}.`,why:fem?`${nom} és una noia → femení: ${f}`:`${nom} és un noi → masculí: ${m}`}};
+    t.acts=["vocab","cartes","buits","quiz","escolta","parelles","escriu","parla"]},
+  articles(t){const O=TEMES.find(x=>x.id==="objets").items.map(normItem),M=TEMES.find(x=>x.id==="maison").items.map(normItem);
+    t.genFrase=()=>{const k=rnd(4);
+      if(k===0){const it=any(O);const m=it.fr.match(/^(le|la|l'|les) ?(.*)$/);const art=m[1],noun=m[2];
+        return {s:`${art==="les"?"Où sont":"Où est"} ___ ${noun} ?`,a:art,o:["le","la","l'","les"],ca:`On ${art==="les"?"són":"és"} ${it.ca}?`,why:`${noun}: `+(art==="les"?"plural → les":art==="l'"?"comença per vocal → l'":art==="le"?"masculí → le":"femení → la")}}
+      if(k===1){const it=any(M);const m=it.fr.match(/^(une?) (.*)$/);
+        return {s:`C'est ___ ${m[2]}.`,a:m[1],o:["un","une"],ca:`És ${it.ca}.`,why:`${m[2]} és ${m[1]==="un"?"masculí → un":"femení → une"}`}}
+      return null};
+    t.parlaFrases=true},
+  verbes(t){const V=t.verbs;
+    t.items=[];V.forEach(v=>v.f.forEach((f,i)=>t.items.push({fr:conj(PRON[i],f),ca:CAPR[i]+" "+v.c[i],grp:v.inf})));
+    t.frases=t.frases.map(x=>{if(!Array.isArray(x))return x;const [s,a,inf,ca,why]=x;const v=V.find(y=>y.inf===inf);
+      return {s,a,o:[a,...shuffle(uniq(v.f).filter(y=>y!==a)).slice(0,3)],ca,why:why||`${inf}: ${a}`}});
+    t.genFrase=()=>{if(rnd(2))return null;const v=any(V),i=rnd(6),fem=rnd(2)&&(i===2||i===5);const pron=(fem?PRONF:PRON)[i],a=v.f[i];
+      const full=conj(pron,a);const s=full.startsWith("j'")?`j'___ (${v.inf})`:`${pron} ___ (${v.inf})`;
+      return {s,a,o:[a,...shuffle(uniq(v.f).filter(y=>y!==a)).slice(0,3)],ca:(fem?CAPRF:CAPR)[i]+" "+v.c[i],why:`${v.inf} → ${full}`}};
+    t.parells=()=>{const v=any(V);return {titol:`Uneix cada pronom amb la forma de «${v.inf}»`,pairs:v.f.map((f,i)=>[conj(PRON[i],f).startsWith("j'")?"j'":PRON[i],f])}};
+    t.regla+=V.map((v,k)=>`<details class="verb"${k<2?" open":""}><summary>${v.inf} <span>· ${v.ca}</span></summary><table>${
+      v.f.map((f,i)=>`<tr><td>«${conj(["je","tu","il / elle","nous","vous","ils / elles"][i],f).replace("il / elle","il / elle")}»</td><td style="color:var(--ink-soft)">${["jo","tu","ell / ella","nosaltres","vosaltres","ells / elles"][i]} ${v.c[i]}</td></tr>`).join("")
+    }</table></details>`).join("");
+    t.parlaFrases=true;
+    t.acts=["regla","buits","escriuB","parelles","escolta","cartes","ordena","parla"]}
 };
+TEMES.forEach(t=>{
+  if(t.items)t.items=t.items.map(normItem);
+  if(t.frases&&t.tipus!=="verbes")t.frases=t.frases.map(normFrase);
+  if(t.tipus&&BUILD[t.tipus])BUILD[t.tipus](t);
+  if(t.regla)t.regla=rich(t.regla);
+});
+/* the "il / elle" inside verb tables should read both pronouns aloud */
+TEMES.forEach(t=>{if(t.regla)t.regla=t.regla.replace(/data-say="il \/ elle ([^"]+)"/g,'data-say="il $1. elle $1"').replace(/data-say="ils \/ elles ([^"]+)"/g,'data-say="ils $1. elles $1"')});
 
-const ACTS={
-  vocab:"Vocabulari", cartes:"Targetes", quiz:"Tria la resposta", escolta:"Escolta", escriu:"Escriu-ho", parelles:"Parelles",
-  calcul:"Càlcul", genre:"Masculí o femení?", ordre:"Ordena", parla:"Parla 🎤"
-};
-const ACTS_BY_THEME={
-  nombres:["vocab","cartes","escolta","quiz","calcul","escriu","parla"],
-  ordinaux:["vocab","cartes","quiz","parelles","escriu","parla"],
-  objets:["vocab","cartes","genre","quiz","escolta","escriu","parla"],
-  maison:["vocab","cartes","genre","quiz","escolta","parelles","escriu","parla"],
-  mois:["vocab","cartes","ordre","escolta","quiz","escriu","parla"],
-  jours:["vocab","cartes","ordre","escolta","quiz","parelles","escriu","parla"],
-  salut:["vocab","cartes","quiz","parelles","escolta","parla"]
-};
-/* Speech recognition (works when the page is opened directly in Chrome, Edge or Safari) */
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let srBlocked=false, parlaMode="llegeix";
-function lev(a,b){const m=a.length,n=b.length;if(!m||!n)return Math.max(m,n);let p=[...Array(n+1).keys()];
-  for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
-const snorm=s=>norm(s).replace(/-/g," ").replace(/^(les|le|la|l'|une|un) ?/,"").trim();
+const ACTS={regla:"La regla",vocab:"Vocabulari",cartes:"Targetes",quiz:"Tria",escolta:"Escolta",parelles:"Parelles",escriu:"Escriu",
+  genre:"Masculí o femení?",article:"Quin article?",ordre:"Ordena",calcul:"Càlcul",buits:"Completa",escriuB:"Escriu la paraula",ordena:"Ordena la frase",parla:"Parla 🎤"};
+function actsOf(t){if(t.acts)return t.acts;const a=[];if(t.regla)a.push("regla");
+  if(t.tipus==="nombres")return ["vocab","cartes","escolta","quiz","calcul","escriu","parla"];
+  const hasF=!!(t.frases||t.genFrase);
+  if(t.items){a.push("vocab","cartes");if(t.items.some(x=>x.g&&/^(le|la|un|une) /.test(x.fr)))a.push("genre");if(t.ordenat)a.push("ordre")}
+  if(hasF){a.push("buits","escriuB");if(!t.items)a.push("cartes")}
+  if(t.parells)a.push("parelles");
+  if(t.items){a.push("quiz","escolta");if(!t.parells)a.push("parelles");a.push("escriu")}
+  if(hasF||t.ordena)a.push("ordena");
+  a.push("parla");return a}
 
-let theme="nombres", act="vocab", room="tot", score={ok:0,total:0};
-const $=s=>document.querySelector(s);
-const stage=$("#stage");
-const rnd=n=>Math.floor(Math.random()*n);
-const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’']/g,"'").replace(/[?!.,]/g,"").replace(/-/g," ").replace(/\s+/g," ").trim();
-const spoken=fr=>fr.split(" / ")[0];
+/* ---------- state & progress (kept only in this browser) ---------- */
+let T=null,act=null,room="tot",score={ok:0,total:0};
+const KEY="cahier-progres-v1";let PROG={};
+try{PROG=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){PROG={}}
+function saveProg(){try{localStorage.setItem(KEY,JSON.stringify(PROG))}catch(e){}}
+const stage=()=>$("#stage");
+const items=()=>T.estances&&room!=="tot"?T.items.filter(x=>x.r===room):T.items;
+function pickItem(){if(T.genItem&&rnd(2))return T.genItem();return any(items())}
+function distract(it,n=3){if(T.distract)return T.distract(it);
+  const pool=items().filter(x=>x.fr!==it.fr&&x.ca!==it.ca);const same=it.grp?shuffle(pool.filter(x=>x.grp===it.grp)):[];
+  return uniq([...same,...shuffle(pool)]).slice(0,n)}
+function pickFrase(){let f=null;if(T.genFrase&&(!T.frases||rnd(2)))f=T.genFrase();if(!f&&T.frases)f=any(T.frases);if(!f&&T.genFrase){let g=0;while(!f&&g++<20)f=T.genFrase()}
+  f={...f};f.fr=clean(fill(f.s,f.a));f.o=shuffle(uniq(f.o.includes(f.a)?f.o:[f.a,...f.o]));return f}
+function frDeck(n=15){const out=[],seen=new Set();let g=0;while(out.length<n&&g++<200){const f=pickFrase();if(!seen.has(f.fr)){seen.add(f.fr);out.push(f)}}return out}
 
-/* Text-to-speech in French */
-let frVoice=null;
+/* ---------- speech synthesis ---------- */
+let frVoice=null,ttsBusy=false;
 function pickVoice(){try{const v=speechSynthesis.getVoices();frVoice=v.find(x=>/^fr(-|_)FR/i.test(x.lang))||v.find(x=>/^fr/i.test(x.lang))||null}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
 function say(text,rate=.85){
-  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="fr-FR";u.rate=rate;if(frVoice)u.voice=frVoice;ttsBusy=true;u.onend=u.onerror=()=>setTimeout(()=>{ttsBusy=false},300);speechSynthesis.speak(u)}
-  catch(e){setFeedback("El navegador no pot reproduir l'àudio.","ko")}
-}
-function speakBtn(text,cls=""){return `<button class="speak ${cls}" data-say="${esc(text)}" aria-label="Escolta: ${esc(text)}">${SPK}<span>Écoute</span></button>`}
-stage.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)say(b.dataset.say)});
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="fr-FR";u.rate=rate;if(frVoice)u.voice=frVoice;
+    ttsBusy=true;u.onend=u.onerror=()=>setTimeout(()=>{ttsBusy=false},300);speechSynthesis.speak(u)}
+  catch(e){setFeedback("El navegador no pot reproduir l'àudio.","ko")}}
+const speakBtn=(text,cls="")=>`<button class="speak ${cls}" data-say="${esc(text)}" aria-label="Escolta: ${esc(text)}">${SPK}<span>Écoute</span></button>`;
+document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)say(b.dataset.say)});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("ex")){e.preventDefault();say(e.target.dataset.say)}});
 
-function setFeedback(msg,kind){const f=$("#fb");if(f){f.textContent=msg;f.className="feedback "+(kind||"")}}
-function scoreBar(){return `<div class="score"><span>${ACTS[act]}</span><span>Encerts: <b>${score.ok}</b> / ${score.total}</span></div>`}
-function mark(ok){score.total++;if(ok)score.ok++;const s=stage.querySelector(".score b");if(s){s.textContent=score.ok;s.parentNode.lastChild.textContent=" / "+score.total}}
-const items=()=>{const t=THEMES[theme];return t.rooms&&room!=="tot"?t.items.filter(x=>x.r===room):t.items};
-function nextBtn(fn){return `<div class="row" style="margin-top:14px"><button class="btn" id="next">Següent →</button></div>`}
-function wireNext(fn){const n=$("#next");if(n)n.onclick=fn}
-
-/* Nav */
-function renderNav(){
-  $("#themes").innerHTML=Object.entries(THEMES).map(([k,t])=>`<button aria-pressed="${k===theme}" data-t="${k}">${t.name}</button>`).join("");
-  $("#acts").innerHTML=ACTS_BY_THEME[theme].map(a=>`<button role="tab" aria-pressed="${a===act}" data-a="${a}">${ACTS[a]}</button>`).join("");
-  $("#tip").textContent="💡 "+THEMES[theme].tip;
-  const R=THEMES[theme].rooms,rb=$("#rooms");rb.hidden=!R;
-  rb.innerHTML=R?Object.entries(R).map(([k,v])=>`<button aria-pressed="${k===room}" data-r="${k}">${v}</button>`).join(""):"";
-}
-$("#themes").onclick=e=>{const b=e.target.closest("[data-t]");if(!b)return;theme=b.dataset.t;act="vocab";room="tot";score={ok:0,total:0};renderNav();run()};
-$("#rooms").onclick=e=>{const b=e.target.closest("[data-r]");if(!b)return;room=b.dataset.r;score={ok:0,total:0};renderNav();run()};
-$("#acts").onclick=e=>{const b=e.target.closest("[data-a]");if(!b)return;act=b.dataset.a;score={ok:0,total:0};renderNav();run()};
-
-function caLabel(it){return it.g?`${it.ca} <span class="tag ${it.g}">${it.g==="m"?"masc.":it.g==="f"?"fem.":"plural"}</span>`:esc(it.ca)}
-
-/* One microphone session for the whole "Parla" activity: permission is asked once, then it keeps listening */
-let micOn=false,recG=null,onHeard=null,nextTimer=null,ttsBusy=false;
+/* ---------- speech recognition: one microphone session per activity ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let srBlocked=false,parlaMode="llegeix",micOn=false,recG=null,onHeard=null,nextTimer=null;
 function paintMic(){const m=$("#mic");if(m){m.textContent=micOn?"● Micròfon obert · toca per tancar":"🎤 Obre el micròfon";m.style.background=micOn?"var(--ko)":""}}
-function startMic(){
-  if(!SR||micOn)return;micOn=true;
+function startMic(){if(!SR||micOn)return;micOn=true;
   recG=new SR();recG.lang="fr-FR";recG.continuous=true;recG.interimResults=false;recG.maxAlternatives=5;
   recG.onresult=e=>{if(ttsBusy)return;const r=e.results[e.results.length-1];if(!r.isFinal)return;
     const alts=[...r].map(a=>a.transcript.trim()).filter(Boolean);if(alts.length&&onHeard&&act==="parla")onHeard(alts)};
   recG.onerror=e=>{if(["not-allowed","service-not-allowed","audio-capture"].includes(e.error)){srBlocked=true;stopMic();if(act==="parla")RUN.parla()}};
-  recG.onend=()=>{if(micOn){setTimeout(()=>{try{micOn&&recG.start()}catch(e){}},200)}};
+  recG.onend=()=>{if(micOn)setTimeout(()=>{try{micOn&&recG&&recG.start()}catch(e){}},200)};
   try{recG.start()}catch(e){micOn=false}
-  paintMic();setFeedback("Micròfon obert. Digues la paraula quan vulguis.","");
-}
+  paintMic();setFeedback("Micròfon obert. Digues-ho quan vulguis.","")}
 function stopMic(){micOn=false;try{recG&&recG.stop()}catch(e){}recG=null;paintMic()}
-/* Activities */
+
+/* ---------- shared UI bits ---------- */
+function setFeedback(msg,kind){const f=$("#fb");if(f){f.textContent=msg;f.className="feedback "+(kind||"")}}
+const scoreBar=(extra)=>`<div class="score"><span>${extra||ACTS[act]}</span><span>Encerts: <b id="sc-ok">${score.ok}</b> / <span id="sc-t">${score.total}</span></span></div>`;
+function mark(ok){score.total++;if(ok)score.ok++;const a=$("#sc-ok"),b=$("#sc-t");if(a){a.textContent=score.ok;b.textContent=score.total}
+  const p=PROG[T.id]||(PROG[T.id]={ok:0,total:0});p.total++;if(ok)p.ok++;p.last=Date.now();PROG._last=T.id;saveProg()}
+const nextBtn=()=>`<div class="row" style="margin-top:14px"><button class="btn" id="next">Següent →</button></div>`;
+function wireNext(fn){const n=$("#next");if(n)n.onclick=fn}
+const gTag=g=>g?`<span class="tag ${g}">${g==="m"?"masc.":g==="f"?"fem.":"plural"}</span>`:"";
+const caLabel=it=>esc(it.ca)+(it.g?" "+gTag(it.g):"");
+const sentHTML=f=>esc(f.s).replace(/\s*\(([^)]*)\)/," <span style=\"color:var(--ink-soft);font-weight:400\">($1)</span>").replace("___",'<span class="gap" id="gap">&nbsp;?&nbsp;</span>');
+const accentsHTML=`<div class="accents">${"é è ê à â ç ô û ù î ï ë œ '".split(" ").map(c=>`<button type="button" data-c="${c}">${c}</button>`).join("")}</div>`;
+function wireAccents(inp){stage().querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{const p=inp.selectionStart??inp.value.length;inp.value=inp.value.slice(0,p)+b.dataset.c+inp.value.slice(p);inp.focus();inp.setSelectionRange(p+1,p+1)})}
+function answerOpts(onDone){stage().querySelectorAll(".opts .opt, .gender .opt").forEach(b=>b.onclick=()=>{
+  const ok=b.dataset.ok==="true";stage().querySelectorAll(".opts .opt, .gender .opt").forEach(x=>{x.disabled=true;if(x.dataset.ok==="true")x.classList.add("ok")});
+  if(!ok)b.classList.add("ko");mark(ok);onDone(ok)})}
+function toks(fr){const out=[];fr.split(" ").forEach(w=>{if(/^[?!:;—]+$/.test(w)&&out.length)out[out.length-1]+=" "+w;else out.push(w)});return out}
+
+/* ---------- activities ---------- */
 const RUN={
+  regla(){stage().innerHTML=`<div class="regla">${T.regla}</div><p class="cahint" style="margin-top:14px">Toca les paraules en francès per escoltar-les.</p>`},
   vocab(){
-    stage.innerHTML=`<p class="label">Llista · toca per escoltar</p><div class="tablewrap"><table class="vocab"><tbody>${
-      items().map((it,i,a)=>(THEMES[theme].rooms&&it.r!==(a[i-1]||{}).r?`<tr><td colspan="3" class="label" style="padding-top:14px;font-weight:700;color:var(--violet)">${THEMES[theme].rooms[it.r]}</td></tr>`:"")+`<tr><td>${esc(it.fr)}${it.abbr?` <span style="color:var(--ink-soft);font-weight:400">(${it.abbr})</span>`:""}</td><td>${caLabel(it)}</td><td style="text-align:right"><button data-say="${esc(spoken(it.fr))}" aria-label="Escolta ${esc(it.fr)}">${SPK}</button></td></tr>`).join("")
-    }</tbody></table></div>`;
-  },
+    const L=items();stage().innerHTML=`<p class="label">Llista · toca 🔊 per escoltar</p><div class="tablewrap"><table class="vocab"><tbody>${
+      L.map((it,i)=>(T.estances&&it.r!==(L[i-1]||{}).r?`<tr><td colspan="3" class="label" style="padding-top:14px;font-weight:700;color:var(--violet)">${T.estances[it.r]}</td></tr>`:"")+
+        `<tr><td>${esc(it.fr)}${it.abbr?` <span style="color:var(--ink-soft);font-weight:400">(${it.abbr})</span>`:""}</td><td>${caLabel(it)}</td><td style="text-align:right"><button data-say="${esc(spoken(it.fr))}" aria-label="Escolta ${esc(it.fr)}">${SPK}</button></td></tr>`).join("")
+    }</tbody></table></div>`},
   cartes(){
-    let order=shuffle(items()),i=0,flipped=false;
-    const draw=()=>{const it=order[i];
-      stage.innerHTML=`<div class="score"><span>Targeta ${i+1} / ${order.length}</span><span>Toca la targeta per girar-la</span></div>
+    const deck=T.items?shuffle(items()):frDeck();let i=0,flipped=false;
+    const draw=()=>{const it=deck[i];
+      stage().innerHTML=`<div class="score"><span>Targeta ${i+1} / ${deck.length}</span><span>Toca per girar-la</span></div>
       <div class="flash"><div class="flash-inner" id="card" tabindex="0" role="button" aria-label="Gira la targeta">
-        ${flipped?`<div class="ca">${caLabel(it)}</div><div class="fr" style="font-size:1.8rem">${esc(it.fr)}</div>`:`<div class="fr">${esc(it.fr)}</div><div class="hint">Què vol dir?</div>`}
+        ${flipped?`<div class="ca">${caLabel(it)}</div><div class="fr" style="font-size:1.7rem">${esc(it.fr)}</div>`:`<div class="fr" style="${it.fr.length>22?"font-size:1.9rem":""}">${esc(it.fr)}</div><div class="hint">Què vol dir?</div>`}
       </div></div>
-      <div class="row">${speakBtn(spoken(it.fr))}<button class="btn ghost" id="prev">← Anterior</button><button class="btn" id="nx">Següent →</button></div>`;
+      <div class="row">${speakBtn(spoken(it.fr))}<button class="btn ghost" id="prev">←</button><button class="btn" id="nx">Següent →</button></div>`;
       const flip=()=>{flipped=!flipped;draw()};
       $("#card").onclick=flip;$("#card").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip()}};
-      $("#nx").onclick=()=>{i=(i+1)%order.length;flipped=false;draw()};
-      $("#prev").onclick=()=>{i=(i-1+order.length)%order.length;flipped=false;draw()};
-    };draw();
-  },
+      $("#nx").onclick=()=>{i=(i+1)%deck.length;flipped=false;draw()};
+      $("#prev").onclick=()=>{i=(i-1+deck.length)%deck.length;flipped=false;draw()}};draw()},
   quiz(){
-    const it=pick();const dir=rnd(2); // 0: FR→CA, 1: CA→FR
-    const others=distract(it);const opts=shuffle([it,...others]);
-    stage.innerHTML=scoreBar()+`<p class="label">${dir?"Com es diu en francès?":"Què vol dir?"}</p>
-      <p class="prompt ${dir?"small":""}">${dir?esc(it.ca):esc(it.fr)}</p>
+    const it=pickItem(),dir=rnd(2),opts=shuffle([it,...distract(it)]);
+    stage().innerHTML=scoreBar()+`<p class="label">${dir?"Com es diu en francès?":"Què vol dir?"}</p>
+      <p class="prompt ${dir||it.fr.length>20?"small":""}">${dir?esc(it.ca):esc(it.fr)}</p>
       ${dir?"":`<div class="row">${speakBtn(spoken(it.fr))}</div>`}
-      <div class="opts">${opts.map(o=>`<button class="opt" data-ok="${o===it}">${esc(dir?o.fr:o.ca)}</button>`).join("")}</div>
+      <div class="opts many">${opts.map(o=>`<button class="opt" data-ok="${o===it}">${esc(dir?o.fr:o.ca)}</button>`).join("")}</div>
       <p class="feedback" id="fb"></p>`+nextBtn();
-    answerOpts(it);wireNext(RUN.quiz);
-  },
+    answerOpts(ok=>{setFeedback((ok?"✔ Très bien ! ":"✘ Oh non… ")+`${it.fr} = ${it.ca}`,ok?"ok":"ko");say(spoken(it.fr))});wireNext(RUN.quiz)},
   escolta(){
-    const it=pick();
-    const others=distract(it);const opts=shuffle([it,...others]);
-    const show=o=>theme==="nombres"?o.ca:o.fr;
-    stage.innerHTML=scoreBar()+`<p class="label">Escolta i tria el que has sentit</p>
+    const it=pickItem(),opts=shuffle([it,...distract(it)]),show=o=>T.tipus==="nombres"?o.ca:o.fr;
+    stage().innerHTML=scoreBar()+`<p class="label">Escolta i tria el que has sentit</p>
       <div class="row" style="margin:14px 0 18px">${speakBtn(spoken(it.fr),"big-speak")}<button class="speak" id="slow" aria-label="Escolta a poc a poc">🐢 Lent</button></div>
-      <div class="opts">${opts.map(o=>`<button class="opt" data-ok="${o===it}" style="${theme==="nombres"?"font-size:1.6rem;font-weight:700":""}">${esc(show(o))}</button>`).join("")}</div>
+      <div class="opts many">${opts.map(o=>`<button class="opt" data-ok="${o===it}" style="${T.tipus==="nombres"?"font-size:1.5rem;font-weight:700":""}">${esc(show(o))}</button>`).join("")}</div>
       <p class="feedback" id="fb"></p>`+nextBtn();
     $("#slow").onclick=()=>say(spoken(it.fr),.55);
-    answerOpts(it);wireNext(RUN.escolta);
-  },
+    answerOpts(ok=>{setFeedback((ok?"✔ Très bien ! ":"✘ Era: ")+`${it.fr} — ${it.ca}`,ok?"ok":"ko");say(spoken(it.fr))});wireNext(RUN.escolta)},
   escriu(){
-    const it=pick();
-    const target=it.fr.split(" / ");
-    stage.innerHTML=scoreBar()+`<p class="label">Escriu-ho en francès</p>
-      <p class="prompt small">${theme==="nombres"?`<span style="font-family:var(--f-display);font-size:3.4rem">${esc(it.ca)}</span>`:esc(it.ca)}</p>
-      <form id="wf" class="row" style="flex-direction:column">
-        <label for="ans" class="label" style="margin:0">La teva resposta</label>
-        <input id="ans" class="answer" autocomplete="off" autocapitalize="off" spellcheck="false">
-        <div class="accents">${"é è ê à â ç ô û ù ï ë œ".split(" ").map(c=>`<button type="button" data-c="${c}">${c}</button>`).join("")}</div>
-        <div class="row" style="margin-top:10px"><button class="btn" type="submit">Comprova</button><button class="btn ghost" type="button" id="hint">Pista</button></div>
-      </form>
+    const it=pickItem(),target=it.fr.split(" / ");
+    stage().innerHTML=scoreBar()+`<p class="label">Escriu-ho en francès</p>
+      <p class="prompt small">${T.tipus==="nombres"?`<span style="font-family:var(--f-display);font-size:3.2rem">${esc(it.ca)}</span>`:caLabel(it)}</p>
+      <form id="wf" class="row" style="flex-direction:column"><label for="ans" class="label" style="margin:0">La teva resposta</label>
+        <input id="ans" class="answer" autocomplete="off" autocapitalize="off" spellcheck="false">${accentsHTML}
+        <div class="row" style="margin-top:10px"><button class="btn" type="submit">Comprova</button><button class="btn ghost" type="button" id="hint">Pista</button></div></form>
       <p class="feedback" id="fb"></p>`+nextBtn();
-    const inp=$("#ans");inp.focus({preventScroll:true});
-    stage.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{const p=inp.selectionStart??inp.value.length;inp.value=inp.value.slice(0,p)+b.dataset.c+inp.value.slice(p);inp.focus();inp.setSelectionRange(p+1,p+1)});
+    const inp=$("#ans");wireAccents(inp);
     $("#hint").onclick=()=>setFeedback("Comença per: «"+target[0].slice(0,Math.ceil(target[0].length/3))+"…»","");
     let done=false;
-    $("#wf").onsubmit=e=>{e.preventDefault();if(done)return;const v=inp.value.trim();if(!v)return;
+    $("#wf").onsubmit=e=>{e.preventDefault();if(done)return;const v=inp.value.trim();if(!v)return;done=true;
       const exact=target.some(t=>t.toLowerCase()===v.toLowerCase().replace(/’/g,"'"));
-      const close=target.some(t=>norm(t)===norm(v));
-      done=true;mark(exact||close);say(spoken(it.fr));
+      const close=!exact&&target.some(t=>norm(t)===norm(v));const noArt=!exact&&!close&&target.some(t=>snorm(t)===snorm(v));
+      mark(exact||close);say(spoken(it.fr));
       if(exact)setFeedback("✔ Très bien ! "+it.fr,"ok");
       else if(close)setFeedback("✔ Gairebé! Revisa els accents: "+it.fr,"ok");
-      else setFeedback("✘ La resposta és: "+it.fr,"ko");};
-    wireNext(RUN.escriu);
-  },
+      else if(noArt)setFeedback("✘ Falta o sobra l'article: "+it.fr,"ko");
+      else setFeedback("✘ La resposta és: "+it.fr,"ko")};
+    wireNext(RUN.escriu)},
   parelles(){
-    const set=shuffle(items()).slice(0,6);const left=shuffle(set),right=shuffle(set);let sel=null,found=0,tries=0;
-    stage.innerHTML=`<div class="score"><span>Uneix cada expressió amb la traducció</span><span id="pc">0 / ${set.length}</span></div>
-      <div class="match"><div class="col">${left.map(o=>`<button class="opt" data-side="l" data-k="${esc(o.fr)}">${esc(o.fr)}</button>`).join("")}</div>
-      <div class="col">${right.map(o=>`<button class="opt" data-side="r" data-k="${esc(o.fr)}">${esc(o.ca)}</button>`).join("")}</div></div>
+    let titol="Uneix cada parella",pairs;
+    if(T.parells){const p=typeof T.parells==="function"?T.parells():{pairs:shuffle(T.parells).slice(0,5)};pairs=p.pairs;if(p.titol)titol=p.titol}
+    else pairs=shuffle(items()).slice(0,6).map(x=>[x.fr,x.ca]);
+    const left=shuffle(pairs),right=shuffle(pairs);let sel=null,found=0,tries=0;
+    stage().innerHTML=`<div class="score"><span>${esc(titol)}</span><span id="pc">0 / ${pairs.length}</span></div>
+      <div class="match"><div class="col">${left.map(p=>`<button class="opt" data-side="l" data-k="${esc(p[1])}" data-fr="${esc(p[0])}">${esc(p[0])}</button>`).join("")}</div>
+      <div class="col">${right.map(p=>`<button class="opt" data-side="r" data-k="${esc(p[1])}">${esc(p[1])}</button>`).join("")}</div></div>
       <p class="feedback" id="fb"></p><div class="row" style="margin-top:8px"><button class="btn" id="next">Nova ronda</button></div>`;
-    stage.querySelector(".match").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.classList.contains("done"))return;
-      if(b.dataset.side==="l")say(spoken(b.dataset.k));
+    stage().querySelector(".match").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.classList.contains("done"))return;
+      if(b.dataset.side==="l")say(spoken(b.dataset.fr));
       if(!sel||sel.dataset.side===b.dataset.side){if(sel)sel.classList.remove("sel");sel=b;b.classList.add("sel");return}
       tries++;
-      if(sel.dataset.k===b.dataset.k){[sel,b].forEach(x=>{x.classList.remove("sel");x.classList.add("done");x.disabled=true});found++;$("#pc").textContent=found+" / "+set.length;
-        setFeedback(found===set.length?`Bravo ! Fet en ${tries} intents.`:"✔","ok")}
+      if(sel.dataset.k===b.dataset.k){[sel,b].forEach(x=>{x.classList.remove("sel");x.classList.add("done");x.disabled=true});found++;$("#pc").textContent=found+" / "+pairs.length;
+        if(found===pairs.length){mark(tries<=pairs.length+1);setFeedback(`Bravo ! Fet en ${tries} intents.`,"ok")}else setFeedback("✔","ok")}
       else{const a=sel;[a,b].forEach(x=>x.classList.add("ko"));setTimeout(()=>[a,b].forEach(x=>x.classList.remove("ko","sel")),600);setFeedback("Torna-ho a provar","ko")}
       sel=null};
-    wireNext(RUN.parelles);
-  },
+    wireNext(RUN.parelles)},
+  genre(){
+    const pool=items().filter(x=>/^(le|la|un|une) /.test(x.fr)),it=any(pool),noun=it.fr.replace(/^(le|la|une|un) /,""),indef=/^une? /.test(it.fr);
+    stage().innerHTML=scoreBar()+`<p class="label">Masculí o femení?</p>
+      <p class="prompt">… ${esc(noun)}</p><p class="cahint">${esc(it.ca)}</p>
+      <div class="gender"><button class="opt" data-g="m" data-ok="${it.g==="m"}">${indef?"un":"le"}</button><button class="opt" data-g="f" data-ok="${it.g==="f"}">${indef?"une":"la"}</button></div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    answerOpts(ok=>{setFeedback((ok?"✔ Très bien ! ":"✘ Oh non… ")+it.fr,ok?"ok":"ko");say(it.fr)});wireNext(RUN.genre)},
+  article(){
+    const it=any(items().filter(x=>x.art));
+    stage().innerHTML=scoreBar()+`<p class="label">Quin article porta?</p>
+      <p class="prompt">… ${esc(it.base)}</p><p class="cahint">${esc(it.ca)}</p>
+      <div class="opts">${["le","la","l'","les"].map(a=>`<button class="opt" style="font-family:var(--f-display);font-size:1.9rem;padding:.3rem" data-ok="${a===it.art}">${a}</button>`).join("")}</div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    answerOpts(ok=>{setFeedback((ok?"✔ Très bien ! ":"✘ Era: ")+it.fr+(it.art==="l'"?` (${it.g==="f"?"femení":"masculí"})`:""),ok?"ok":"ko");say(it.fr)});wireNext(RUN.article)},
+  ordre(){
+    const all=items(),start=rnd(all.length),seq=[0,1,2,3].map(k=>all[(start+k)%all.length]);let pos=0,missed=false;const built=[];
+    stage().innerHTML=scoreBar()+`<p class="label">Toca en ordre, començant per ${esc(seq[0].ca)}</p>
+      <p class="prompt small" id="built" style="min-height:2.2em">…</p>
+      <div class="opts">${shuffle(seq).map(o=>`<button class="opt" data-k="${esc(o.fr)}">${esc(o.fr)}</button>`).join("")}</div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    stage().querySelector(".opts").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;say(b.dataset.k);
+      if(b.dataset.k===seq[pos].fr){b.classList.add("ok");b.disabled=true;built.push(b.dataset.k);pos++;$("#built").textContent=built.join(" → ");
+        if(pos===seq.length){mark(!missed);setFeedback("✔ Parfait !","ok")}}
+      else{b.classList.add("ko");setTimeout(()=>b.classList.remove("ko"),500);missed=true;setFeedback("Aquest no toca encara","ko")}};
+    wireNext(RUN.ordre)},
   calcul(){
     let a,b,op,r;const lvl=rnd(3);
     do{const m=lvl===0?11:lvl===1?600:500001;const unit=lvl===2&&rnd(2)?1000:1;
       a=rnd(m/unit)*unit;b=rnd(m/unit)*unit;op=rnd(2)?"plus":"moins";if(op==="moins"&&b>a)[a,b]=[b,a];r=op==="plus"?a+b:a-b}while(r>1e6);
-    const opts=shuffle([r,...nearNums(r,3)]);
-    const sentence=`${frNum(a)} ${op} ${frNum(b)}`;
-    stage.innerHTML=scoreBar()+`<p class="label">Calcula i tria la resposta en francès</p>
+    const opts=shuffle([r,...nearNums(r,3)]),sentence=`${frNum(a)} ${op} ${frNum(b)}`;
+    stage().innerHTML=scoreBar()+`<p class="label">Calcula i tria la resposta en francès</p>
       <p class="prompt" style="font-size:clamp(1.6rem,6vw,2.6rem)">${esc(sentence)}</p><div class="row">${speakBtn(sentence+" égale combien ?")}</div>
-      <div class="opts">${opts.map(n=>`<button class="opt" data-ok="${n===r}">${esc(frNum(n))}</button>`).join("")}</div>
+      <div class="opts many">${opts.map(n=>`<button class="opt" data-ok="${n===r}">${esc(frNum(n))}</button>`).join("")}</div>
       <p class="feedback" id="fb"></p>`+nextBtn();
-    answerOpts({fr:`${sentence} égale ${frNum(r)}`,ca:`${fmt(a)} ${op==="plus"?"+":"−"} ${fmt(b)} = ${fmt(r)}`},true);wireNext(RUN.calcul);
-  },
-  genre(){
-    const pool=items().filter(x=>/^(le|la|un|une) /.test(x.fr));const it=pool[rnd(pool.length)];const noun=it.fr.replace(/^(le|la|une|un) /,"");
-    const indef=/^une? /.test(it.fr);
-    stage.innerHTML=scoreBar()+`<p class="label">Masculí o femení?</p>
-      <p class="prompt">… ${esc(noun)}</p><p style="text-align:center;margin:-6px 0 10px;color:var(--ink-soft)">${esc(it.ca)}</p>
-      <div class="gender"><button class="opt" data-g="m" data-ok="${it.g==="m"}">${indef?"un":"le"}</button><button class="opt" data-g="f" data-ok="${it.g==="f"}">${indef?"une":"la"}</button></div>
+    answerOpts(ok=>{setFeedback((ok?"✔ Très bien ! ":"✘ Oh non… ")+`${fmt(a)} ${op==="plus"?"+":"−"} ${fmt(b)} = ${fmt(r)}`,ok?"ok":"ko");say(`${sentence} égale ${frNum(r)}`)});wireNext(RUN.calcul)},
+  buits(){
+    const f=pickFrase();
+    stage().innerHTML=scoreBar()+`<p class="label">Tria la paraula que falta</p>
+      <p class="sent">${sentHTML(f)}</p><p class="cahint">${esc(f.ca)}</p>
+      <div class="opts ${f.o.some(x=>x.length>8)?"many":""}">${f.o.map(o=>`<button class="opt" data-ok="${o===f.a}">${esc(o)}</button>`).join("")}</div>
+      <p class="feedback" id="fb"></p><p class="why" id="why"></p>`+nextBtn();
+    answerOpts(ok=>{$("#gap").textContent=f.a;setFeedback((ok?"✔ Très bien ! ":"✘ Era: ")+f.fr,ok?"ok":"ko");if(f.why)$("#why").textContent="💡 "+f.why;say(f.fr)});
+    wireNext(RUN.buits)},
+  escriuB(){
+    const f=pickFrase();
+    stage().innerHTML=scoreBar()+`<p class="label">Escriu la paraula que falta</p>
+      <p class="sent">${sentHTML(f)}</p><p class="cahint">${esc(f.ca)}</p>
+      <form id="wf" class="row" style="flex-direction:column"><label for="ans" class="label" style="margin:0">La paraula</label>
+        <input id="ans" class="answer" autocomplete="off" autocapitalize="off" spellcheck="false">${accentsHTML}
+        <div class="row" style="margin-top:10px"><button class="btn" type="submit">Comprova</button><button class="btn ghost" type="button" id="hint">Opcions</button></div></form>
+      <p class="feedback" id="fb"></p><p class="why" id="why"></p>`+nextBtn();
+    const inp=$("#ans");wireAccents(inp);
+    $("#hint").onclick=()=>setFeedback("Pot ser: "+f.o.join(" · "),"");
+    let done=false;
+    $("#wf").onsubmit=e=>{e.preventDefault();if(done)return;const v=inp.value.trim().replace(/’/g,"'");if(!v)return;done=true;
+      const exact=v.toLowerCase()===f.a.toLowerCase(),close=!exact&&norm(v)===norm(f.a);
+      mark(exact||close);$("#gap").textContent=f.a;say(f.fr);if(f.why)$("#why").textContent="💡 "+f.why;
+      setFeedback(exact?"✔ Très bien ! "+f.fr:close?"✔ Gairebé! Revisa els accents: "+f.a:"✘ Era: "+f.a+" — "+f.fr,exact||close?"ok":"ko")};
+    wireNext(RUN.escriuB)},
+  ordena(){
+    let src=null;
+    if(T.items&&(!(T.frases||T.genFrase)||rnd(2))){const c=items().filter(x=>toks(spoken(x.fr)).length>=3);if(c.length){const it=any(c);src={fr:spoken(it.fr),ca:it.ca}}}
+    if(!src){let g=0;do{src=pickFrase()}while(toks(src.fr).length<3&&g++<30)}
+    const words=toks(src.fr);let order=words.map((w,i)=>i),g=0;do{order=shuffle(order)}while(order.every((v,i)=>v===i)&&g++<10);
+    const built=[];let done=false;
+    stage().innerHTML=scoreBar()+`<p class="label">Ordena les paraules</p><p class="cahint" style="font-size:1.1rem">${esc(src.ca)}</p>
+      <div class="built" id="built" aria-live="polite"></div><div class="tiles" id="pool"></div>
+      <div class="row" style="margin-top:12px"><button class="btn ghost" id="undo">↶ Desfés</button></div>
       <p class="feedback" id="fb"></p>`+nextBtn();
-    answerOpts(it);wireNext(RUN.genre);
-  },
+    const paint=()=>{$("#built").innerHTML=built.map(i=>`<button class="tile" data-i="${i}">${esc(words[i])}</button>`).join("");
+      $("#pool").innerHTML=order.filter(i=>!built.includes(i)).map(i=>`<button class="tile" data-i="${i}">${esc(words[i])}</button>`).join("")};
+    paint();
+    $("#pool").onclick=e=>{const b=e.target.closest(".tile");if(!b||done)return;built.push(+b.dataset.i);paint();
+      if(built.length===words.length){done=true;const got=built.map(i=>words[i]).join(" ");const ok=norm(got)===norm(src.fr);mark(ok);
+        setFeedback(ok?"✔ Parfait ! "+src.fr:"✘ L'ordre correcte és: "+src.fr,ok?"ok":"ko");say(src.fr)}};
+    $("#built").onclick=e=>{const b=e.target.closest(".tile");if(!b||done)return;built.splice(built.indexOf(+b.dataset.i),1);paint()};
+    $("#undo").onclick=()=>{if(done)return;built.pop();paint()};
+    wireNext(RUN.ordena)},
   parla(){
     clearTimeout(nextTimer);onHeard=null;
-    const it=pick();
+    let it;
+    if((T.parlaFrases||!T.items)&&(T.frases||T.genFrase)){const f=pickFrase();it={fr:f.fr,ca:f.ca}}else it=pickItem();
     const targets=it.fr.split(" / ").map(t=>t.replace(/ Joan$/,""));
-    const accept=[...targets,...it.fr.split(" / "),...(it.n!=null&&theme==="nombres"?[String(it.n)]:[]),...(it.abbr?[it.abbr]:[])];
+    const accept=[...targets,...it.fr.split(" / "),...(it.n!=null?[String(it.n)]:[]),...(it.abbr?[it.abbr]:[])];
     const canListen=SR&&!srBlocked;
     const shown=parlaMode==="llegeix"
-      ?`<p class="label">Llegeix-ho en veu alta</p><p class="prompt">${esc(it.fr)}</p>`
-      :`<p class="label">Digues-ho en francès (de memòria)</p><p class="prompt small">${theme==="nombres"?`<span style="font-family:var(--f-display);font-size:3.4rem">${esc(it.ca)}</span>`:esc(it.ca)}</p>`;
-    stage.innerHTML=scoreBar()+`<div class="row" style="margin-bottom:10px">
+      ?`<p class="label">Llegeix-ho en veu alta</p><p class="prompt ${it.fr.length>22?"small":""}">${esc(it.fr)}</p>`
+      :`<p class="label">Digues-ho en francès (de memòria)</p><p class="prompt small">${T.tipus==="nombres"?`<span style="font-family:var(--f-display);font-size:3.2rem">${esc(it.ca)}</span>`:esc(it.ca)}</p>`;
+    stage().innerHTML=scoreBar()+`<div class="row" style="margin-bottom:10px">
         <button class="speak" id="m-l" aria-pressed="${parlaMode==="llegeix"}" style="${parlaMode==="llegeix"?"":"background:transparent"}">Llegir</button>
         <button class="speak" id="m-r" aria-pressed="${parlaMode==="recita"}" style="${parlaMode==="recita"?"":"background:transparent"}">Recitar</button></div>
       ${shown}
@@ -440,57 +842,70 @@ const RUN={
         <button class="btn ghost" id="s-ko">Ho he de repetir</button><button class="btn" id="s-ok">Ho he dit bé</button></div>
       <p class="feedback" id="fb">${canListen?"":"Aquí no es pot fer servir el micròfon. Digues-ho en veu alta, escolta el model i valora-ho tu mateix."}</p>`+nextBtn();
     $("#m-l").onclick=()=>{parlaMode="llegeix";RUN.parla()};$("#m-r").onclick=()=>{parlaMode="recita";RUN.parla()};
-    let done=false;
-    const reveal=()=>{const m=$("#model");if(m)m.hidden=false};
+    let done=false;const reveal=()=>{const m=$("#model");if(m)m.hidden=false};
     if(!canListen){
       if(parlaMode==="recita"){$("#self").hidden=true;const r=document.createElement("div");r.className="row";r.innerHTML=`<button class="btn ghost" id="show">Mostra la resposta</button>`;$("#self").before(r);
         $("#show").onclick=()=>{r.remove();reveal();$("#self").hidden=false;$("#heard").textContent=it.fr;say(spoken(it.fr))}}
       $("#s-ok").onclick=()=>{if(done)return;done=true;mark(true);setFeedback("✔ Très bien !","ok")};
       $("#s-ko").onclick=()=>{if(done)return;done=true;mark(false);setFeedback("Escolta el model i torna-ho a provar.","ko");say(spoken(it.fr))};
     } else {
-      paintMic();
+      paintMic();if(micOn)setFeedback("Micròfon obert. Digues-ho quan vulguis.","");
       $("#mic").onclick=()=>micOn?stopMic():startMic();
       onHeard=alts=>{
         let best=alts[0],bestScore=0;
         for(const a of alts)for(const t of accept){const x=snorm(a),y=snorm(t);const s=1-lev(x,y)/Math.max(x.length,y.length,1);if(s>bestScore){bestScore=s;best=a}}
-        if(theme==="nombres"&&alts.some(a=>a.replace(/\D/g,"")===String(it.n))){bestScore=1;best=alts.find(a=>a.replace(/\D/g,"")===String(it.n))}
+        if(it.n!=null&&alts.some(a=>a.replace(/\D/g,"")===String(it.n))){bestScore=1;best=alts.find(a=>a.replace(/\D/g,"")===String(it.n))}
         $("#heard").innerHTML=`He entès: «<b>${esc(best)}</b>»`;
         const counted=!done;done=true;
         if(bestScore>=.99){if(counted)mark(true);setFeedback("✔ Parfait ! Pronúncia reconeguda.","ok");nextTimer=setTimeout(RUN.parla,1600)}
         else if(bestScore>=.7){if(counted)mark(true);setFeedback("✔ Gairebé! Era: "+it.fr,"ok");reveal();nextTimer=setTimeout(RUN.parla,2600)}
-        else{if(counted)mark(false);setFeedback("✘ No ho he reconegut. Era: "+it.fr+" — torna-ho a provar.","ko");reveal();say(spoken(it.fr))}
-      };
+        else{if(counted)mark(false);setFeedback("✘ No ho he reconegut. Era: "+it.fr+" — torna-ho a provar.","ko");reveal();say(spoken(it.fr))}};
     }
-    wireNext(RUN.parla);
-  },
-  ordre(){
-    const all=items();const start=rnd(all.length);const seq=[0,1,2,3].map(k=>all[(start+k)%all.length]);let pos=0;
-    stage.innerHTML=scoreBar()+`<p class="label">Toca els ${theme==="jours"?"dies":"mesos"} en ordre (comença per ${esc(seq[0].ca)})</p>
-      <p class="prompt small" id="built" style="min-height:2.2em">…</p>
-      <div class="opts">${shuffle(seq).map(o=>`<button class="opt" data-k="${o.fr}">${o.fr}</button>`).join("")}</div>
-      <p class="feedback" id="fb"></p>`+nextBtn();
-    const built=[];
-    stage.querySelector(".opts").onclick=e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;say(b.dataset.k);
-      if(b.dataset.k===seq[pos].fr){b.classList.add("ok");b.disabled=true;built.push(b.dataset.k);pos++;$("#built").textContent=built.join(" → ");
-        if(pos===seq.length){mark(true);setFeedback("✔ Parfait !","ok")}}
-      else{b.classList.add("ko");setTimeout(()=>b.classList.remove("ko"),500);if(!stage.dataset.missed){mark(false);stage.dataset.missed=1}setFeedback("No, aquest no toca encara","ko")}};
-    delete stage.dataset.missed;wireNext(RUN.ordre);
-  }
+    wireNext(RUN.parla)}
 };
 
-function answerOpts(it,isCalc){
-  stage.querySelectorAll(".opts .opt, .gender .opt").forEach(b=>b.onclick=()=>{
-    const ok=b.dataset.ok==="true";
-    stage.querySelectorAll(".opts .opt, .gender .opt").forEach(x=>{x.disabled=true;if(x.dataset.ok==="true")x.classList.add("ok")});
-    if(!ok)b.classList.add("ko");mark(ok);
-    const full=theme==="objets"&&act==="genre"?it.fr:isCalc?it.ca:`${it.fr} = ${it.ca}`;
-    setFeedback((ok?"✔ Très bien ! ":"✘ Oh non… ")+full,ok?"ok":"ko");
-    say(spoken(it.fr));
-  });
+/* ---------- views ---------- */
+const DAY=864e5;
+function isNew(t){return t.afegit&&(Date.now()-new Date(t.afegit).getTime())<14*DAY}
+function renderIndex(){
+  const last=TEMES.find(t=>t.id===PROG._last);
+  $("#app").innerHTML=`<div class="in"><header class="hero"><h1>Cahier de français</h1>
+    <p class="sub">Francès per a principiants. Tria un tema i practica amb àudio, targetes, jocs i el micròfon.</p>
+    ${last?`<a class="resume" href="#${last.id}">Continua → ${esc(last.titol)} <span>· on ho vas deixar</span></a>`:""}</header>
+    ${BLOCS.map(b=>{const ts=TEMES.filter(t=>t.bloc===b.id);if(!ts.length)return "";
+      return `<section class="bloc"><h2>${b.nom}</h2><div class="cards">${ts.map(t=>{const p=PROG[t.id];const pct=p&&p.total?Math.round(100*p.ok/p.total):0;
+        return `<a class="card" href="#${t.id}">${isNew(t)?`<span class="nou">Nou</span>`:""}<span class="chip">${esc(t.mostra||"")}</span>
+          <span style="min-width:0"><b>${esc(t.titol)}</b><small>${esc(t.desc||"")}</small>
+          ${p&&p.total?`<span class="prog" aria-hidden="true"><i style="width:${pct}%"></i></span><span class="progtxt">${p.ok} encerts de ${p.total} · ${pct}%</span>`:""}</span></a>`}).join("")}</div></section>`}).join("")}
+    <div class="foot"><span>El progrés es guarda només en aquest dispositiu.</span><button id="reset">Esborra el meu progrés</button></div></div>`;
+  const r=$("#reset");let armed=false;
+  r.onclick=()=>{if(!armed){armed=true;r.textContent="Segur? Toca de nou per esborrar";return}PROG={};saveProg();renderIndex()};
 }
-
-function run(){clearTimeout(nextTimer);if(act!=="parla"&&micOn)stopMic();RUN[act]()}
-renderNav();run();
+function renderTema(){
+  const A=actsOf(T);
+  $("#app").innerHTML=`<div class="top"><a class="back" href="#" aria-label="Torna a l'índex">← Índex</a><h1>${esc(T.titol)}</h1></div>
+    <div class="in"><nav class="tabs" id="tabs" aria-label="Activitats">${A.map(a=>`<button aria-pressed="${a===act}" data-a="${a}">${ACTS[a]}</button>`).join("")}</nav>
+    ${T.estances?`<div class="rooms" id="rooms">${Object.entries(T.estances).map(([k,v])=>`<button aria-pressed="${k===room}" data-r="${k}">${v}</button>`).join("")}</div>`:""}
+    <section class="stage" id="stage" aria-live="polite"></section>
+    ${T.consell?`<p class="tip">💡 ${esc(T.consell)}</p>`:""}</div>`;
+  $("#tabs").onclick=e=>{const b=e.target.closest("[data-a]");if(!b)return;history.replaceState(null,"","#"+T.id+"."+b.dataset.a);route()};
+  if(T.estances)$("#rooms").onclick=e=>{const b=e.target.closest("[data-r]");if(!b)return;room=b.dataset.r;score={ok:0,total:0};renderTema()};
+  const cur=$("#tabs [aria-pressed=true]");if(cur)cur.scrollIntoView({block:"nearest",inline:"center"});
+  clearTimeout(nextTimer);if(act!=="parla"&&micOn)stopMic();
+  RUN[act]();
+}
+function route(){
+  const [id,a]=decodeURIComponent(location.hash.slice(1)).split(".");
+  const t=TEMES.find(x=>x.id===id);
+  clearTimeout(nextTimer);
+  if(!t){if(micOn)stopMic();T=null;renderIndex();window.scrollTo(0,0);return}
+  const A=actsOf(t);const newT=T!==t;
+  if(newT){T=t;room="tot";window.scrollTo(0,0)}
+  const na=A.includes(a)?a:A[0];if(na!==act||newT)score={ok:0,total:0};act=na;
+  renderTema();
+}
+window.addEventListener("hashchange",route);
+route();
 </script>
 
 </body></html>
