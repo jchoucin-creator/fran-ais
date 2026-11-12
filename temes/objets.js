@@ -8,4 +8,4 @@ CAHIER.tema({id:"objets",bloc:"vocabulari",titol:"Objectes de la classe",mostra:
   ["le stylo","el bolígraf","m"],["le crayon","el llapis","m"],["la gomme","la goma","f"],["la règle","el regle","f"],["le feutre","el retolador","m"],
   ["le taille-crayon","la maquineta","m"],["les ciseaux","les tisores","p"],["la colle","la cola","f"],["la trousse","l'estoig","f"],
   ["le cahier","la llibreta","m"],["le cahier de textes","l'agenda escolar","m"],["le livre","el llibre","m"],["la feuille","el full","f"],
-  ["le sac à dos","la motxilla","m"],["l'ordinateur","l'ordinador","m"],["la calculatrice","la calculadora","f"]]});
+  ["le sac à dos","la motxilla","m"],["l'ordinateur","l'ordinador","m"],["la souris","el ratolí (de l'ordinador)","f"],["la clé USB","la memòria USB","f"],["la calculatrice","la calculadora","f"]]});

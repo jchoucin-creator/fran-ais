@@ -140,3 +140,16 @@ details.verb summary span{font-weight:400;color:var(--ink-soft)}
 details.verb table{margin:0}
 details.verb td{padding:.35rem .8rem}
 @media (prefers-reduced-motion:no-preference){.opt,.btn,.tile,.flash-inner,.card{transition:background .15s,border-color .15s,transform .15s}.opt:active,.tile:active{transform:scale(.97)}}
+
+/* correction marks in the writing activities */
+.feedback small{font-weight:400;color:var(--ink-soft)}
+.fbline{font-weight:400;color:var(--ink);font-size:1.1rem}
+.mk{font-weight:700;border-bottom:2.5px solid currentColor;padding-bottom:1px}
+.mk.miss{color:var(--ok)}
+.mk.acc{color:var(--violet)}
+.feedback s{color:var(--ko);font-weight:400}
+
+/* liaison marker */
+.junc{display:inline-block;min-width:1.4em;text-align:center;color:var(--violet);border-bottom:2.5px dashed var(--violet);margin:0 .1em;line-height:1.1}
+.junc.si{color:var(--ok);border-color:var(--ok);border-bottom-style:solid}
+.junc.no{color:var(--ko);border-color:var(--ko);border-bottom-style:solid}

@@ -18,7 +18,7 @@
 
   Camps d'un tema:
     id        identificador curt, igual que el nom del fitxer: "couleurs"
-    bloc      "comunicacio" | "vocabulari" | "mon" | "gramatica"
+    bloc      "comunicacio" | "vocabulari" | "mon" | "gramatica" | "pronunciacio"
     titol     nom del tema a l'índex
     mostra    2-3 paraules d'exemple que surten a la targeta
     desc      una línia de descripció
@@ -32,6 +32,8 @@
     ordenat   true si els items tenen un ordre (mesos, dies…)
     genFrase  generador de frases infinites (vegeu temes/demonstratifs.js)
     generat   proporció de frases generades quan n'hi ha també d'escrites: 0.7
+    paraules  llista de paraules per als dictats de lletres (vegeu temes/epeler.js)
+    decisions frases amb un lloc marcat i opcions per triar (vegeu temes/liaisons.js)
   Les activitats es trien soles segons el que tingui cada tema.
 -->
 <div class="wrap" id="app"></div>
@@ -43,12 +45,15 @@ CAHIER.blocs([
   {id:"comunicacio",nom:"Comunicació"},
   {id:"vocabulari",nom:"Vocabulari"},
   {id:"mon",nom:"El món"},
-  {id:"gramatica",nom:"Gramàtica"}
+  {id:"gramatica",nom:"Gramàtica"},
+  {id:"pronunciacio",nom:"Pronunciació"}
 ]);
 </script>
 
 <!-- TEMES (un fitxer per tema) -->
 <script src="temes/salut.js"></script>
+<script src="temes/alphabet.js"></script>
+<script src="temes/epeler.js"></script>
 <script src="temes/questions.js"></script>
 <script src="temes/nombres.js"></script>
 <script src="temes/ordinaux.js"></script>
@@ -63,4 +68,5 @@ CAHIER.blocs([
 <script src="temes/possessifs.js"></script>
 <script src="temes/demonstratifs.js"></script>
 <script src="temes/verbes.js"></script>
+<script src="temes/liaisons.js"></script>
 </body></html>

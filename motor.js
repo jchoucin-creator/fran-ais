@@ -14,7 +14,8 @@ const uniq=a=>[...new Set(a)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’']/g,"'").replace(/[?!.,;:—]/g,"").replace(/-/g," ").replace(/\s+/g," ").trim();
 const snorm=s=>norm(s).replace(/^(les|le|la|l'|une|un|des) ?/,"").trim();
-const spoken=fr=>fr.split(" / ")[0];
+const SAYMAP={};
+const spoken=fr=>SAYMAP[fr]||fr.split(" / ")[0];
 const clean=s=>s.replace(/\s*\([^)]*\)/g,"").replace(/\s+([.?!])/g," $1").replace(/ \./g,".").trim();
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 function fill(s,a){return s.replace(/(['’])\s?___/,"$1"+a).replace(/___\s?/,m=>a.endsWith("'")?a:a+(m.endsWith(" ")?" ":""))}
@@ -105,7 +106,8 @@ const BUILD={
     t.acts=["regla","buits","escriuB","parelles","escolta","cartes","ordena","parla"]}
 };
 const ACTS={regla:"La regla",vocab:"Vocabulari",cartes:"Targetes",quiz:"Tria",escolta:"Escolta",parelles:"Parelles",escriu:"Escriu",
-  genre:"Masculí o femení?",article:"Quin article?",ordre:"Ordena",calcul:"Càlcul",buits:"Completa",escriuB:"Escriu la paraula",ordena:"Ordena la frase",parla:"Parla 🎤"};
+  genre:"Masculí o femení?",article:"Quin article?",ordre:"Ordena",calcul:"Càlcul",buits:"Completa",escriuB:"Escriu la paraula",ordena:"Ordena la frase",dictat:"Dictat de lletres",lletreja:"Lletreja",parla:"Parla 🎤"};
+function actLabel(a){const dm=/^d(\d+)$/.exec(a);return dm&&T&&T.decisions?T.decisions[+dm[1]].nom:ACTS[a]}
 function actsOf(t){if(t.acts)return t.acts;const a=[];if(t.regla)a.push("regla");
   if(t.tipus==="nombres")return ["vocab","cartes","escolta","quiz","calcul","escriu","parla"];
   const hasF=!!(t.frases||t.genFrase);
@@ -114,6 +116,8 @@ function actsOf(t){if(t.acts)return t.acts;const a=[];if(t.regla)a.push("regla")
   if(t.parells)a.push("parelles");
   if(t.items){a.push("quiz","escolta");if(!t.parells)a.push("parelles");a.push("escriu")}
   if(hasF||t.ordena)a.push("ordena");
+  if(t.paraules)a.push("dictat","lletreja");
+  if(t.decisions)t.decisions.forEach((d,i)=>a.splice(t.regla?1+i:i,0,"d"+i));
   a.push("parla");return a}
 
 /* ---------- state & progress (kept only in this browser) ---------- */
@@ -127,6 +131,7 @@ function pickItem(){if(T.genItem&&rnd(2))return T.genItem();return any(items())}
 function distract(it,n=3){if(T.distract)return T.distract(it);
   const pool=items().filter(x=>x.fr!==it.fr&&x.ca!==it.ca);const same=it.grp?shuffle(pool.filter(x=>x.grp===it.grp)):[];
   return uniq([...same,...shuffle(pool)]).slice(0,n)}
+function pickParaula(){const L=T.paraules||[];if(T.ambLexic&&typeof LEXIC!=="undefined"&&rnd(2))return any(LEXIC).fr;return any(L)}
 function pickFrase(){let f=null;if(T.genFrase&&(!T.frases||Math.random()<(T.generat??.5)))f=T.genFrase();if(!f&&T.frases)f=any(T.frases);if(!f&&T.genFrase){let g=0;while(!f&&g++<20)f=T.genFrase()}
   f={...f};f.fr=clean(fill(f.s,f.a));f.o=shuffle(uniq(f.o.includes(f.a)?f.o:[f.a,...f.o]));return f}
 function frDeck(n=15){const out=[],seen=new Set();let g=0;while(out.length<n&&g++<200){const f=pickFrase();if(!seen.has(f.fr)){seen.add(f.fr);out.push(f)}}return out}
@@ -173,6 +178,60 @@ function answerOpts(onDone){stage().querySelectorAll(".opts .opt, .gender .opt")
   const ok=b.dataset.ok==="true";stage().querySelectorAll(".opts .opt, .gender .opt").forEach(x=>{x.disabled=true;if(x.dataset.ok==="true")x.classList.add("ok")});
   if(!ok)b.classList.add("ko");mark(ok);onDone(ok)})}
 function toks(fr){const out=[];fr.split(" ").forEach(w=>{if(/^[?!:;—]+$/.test(w)&&out.length)out[out.length-1]+=" "+w;else out.push(w)});return out}
+
+/* ---------- answer checking for the writing activities ----------
+   Ignores capitals and punctuation spacing (Comment ça va? = Comment ça va ?),
+   then tells apart: accents, hyphens, article, small typo, wrong word. */
+const punt=s=>s.toLowerCase().replace(/[’`]/g,"'").replace(/[?!.,;:¿¡«»"…]/g," ").replace(/\s+/g," ").trim();
+const deacc=w=>w.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/œ/g,"oe");
+const TOK=/[\p{L}\p{N}]+['’]?/gu;
+function toksPos(s){return [...s.matchAll(TOK)].map(m=>({w:m[0].toLowerCase().replace(/’/g,"'"),i:m.index,len:m[0].length}))}
+function lcsAlign(a,b,eq){const n=a.length,m=b.length,L=Array.from({length:n+1},()=>Array(m+1).fill(0));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=eq(a[i],b[j])?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  const pairs=[];let i=0,j=0;while(i<n&&j<m){if(eq(a[i],b[j])){pairs.push([i,j]);i++;j++}else if(L[i+1][j]>=L[i][j+1])i++;else j++}return pairs}
+function corregeix(targets,v){
+  if(!Array.isArray(targets))targets=[targets];
+  const raw=v.trim();if(!raw)return null;
+  const best=targets.slice().sort((x,y)=>lev(norm(x),norm(raw))-lev(norm(y),norm(raw)))[0];
+  const nota=/\s[?!:;]/.test(best)&&/\S[?!:;]/.test(raw)?`<br><small>Nota: en francès es deixa un espai abans de ? ! : ; (en català no). No compta com a error.</small>`:"";
+  if(targets.some(t=>punt(t)===punt(raw)))return {ok:true,html:`✔ Très bien ! ${esc(best)}${nota}`,cls:"ok"};
+  /* word by word, against the closest correct answer, keeping its capitals and signs */
+  const T_=toksPos(best),U_=toksPos(raw),tw=T_.map(x=>x.w),uw=U_.map(x=>x.w);
+  const pairs=lcsAlign(tw,uw,(x,y)=>deacc(x)===deacc(y));
+  const mT=new Map(pairs),mU=new Set(pairs.map(p=>p[1]));
+  const accents=pairs.filter(([i,j])=>tw[i]!==uw[j]).map(([i,j])=>`${esc(U_[j].w)} → <b>${esc(T_[i].w)}</b>`);
+  const missing=tw.filter((w,i)=>!mT.has(i)),extra=uw.filter((w,j)=>!mU.has(j));
+  let html="",pos=0;
+  T_.forEach((t,i)=>{html+=esc(best.slice(pos,t.i));const w=best.substr(t.i,t.len);
+    html+=!mT.has(i)?`<span class="mk miss">${esc(w)}</span>`:tw[i]!==uw[mT.get(i)]?`<span class="mk acc">${esc(w)}</span>`:esc(w);pos=t.i+t.len});
+  html+=esc(best.slice(pos));
+  const line=`<br><span class="fbline">${html}</span>`;
+  if(!missing.length&&!extra.length){
+    if(!accents.length)return {ok:true,html:`✔ Molt bé! Compte només amb els guionets o els apòstrofs:${line}${nota}`,cls:"ok"};
+    const gui=deacc(punt(best))!==deacc(punt(raw))?" · i compte amb els guionets o els apòstrofs":"";
+    return {ok:true,html:`✔ Gairebé! Revisa els accents: ${accents.join(", ")}${gui}${line}${nota}`,cls:"ok"}}
+  const ART=/^(le|la|l'|les|un|une|des)$/;
+  const acc=accents.length?`<br>Accents: ${accents.join(", ")}`:"";
+  if(missing.every(w=>ART.test(w))&&extra.every(w=>ART.test(w)))
+    return {ok:false,html:`✘ ${!extra.length?"Falta l'article.":!missing.length?"Sobra l'article.":"L'article no és el correcte."}${line}${acc}`,cls:"ko"};
+  const near=lev(norm(best),norm(raw))<=Math.max(1,Math.round(norm(best).length*.2));
+  return {ok:false,html:(near?"✘ Gairebé! Hi ha una errada.":"✘ No és correcte.")+` La resposta és:${line}`+
+    (extra.length?`<br>Has escrit: <s>${esc(extra.join(" "))}</s>`:"")+acc,cls:"ko"};
+}
+function setFeedbackHTML(html,kind){const f=$("#fb");if(f){f.innerHTML=html;f.className="feedback "+(kind||"")}}
+
+/* ---------- spelling (épeler) ---------- */
+const LL={a:"a",b:"bé",c:"cé",d:"dé",e:"e",f:"effe",g:"gé",h:"ache",i:"i",j:"ji",k:"ka",l:"elle",m:"emme",n:"enne",o:"o",p:"pé",q:"ku",r:"erre",s:"esse",t:"té",u:"u",v:"vé",w:"double vé",x:"ixe",y:"i grec",z:"zède"};
+const LLX={"é":"e accent aigu","è":"e accent grave","ê":"e accent circonflexe","ë":"e tréma","à":"a accent grave","â":"a accent circonflexe","î":"i accent circonflexe",
+  "ï":"i tréma","ô":"o accent circonflexe","û":"u accent circonflexe","ù":"u accent grave","ü":"u tréma","ç":"c cédille","œ":"e dans l'o","'":"apostrophe","-":"trait d'union"};
+const nomLletra=c=>{const l=c.toLowerCase();return LLX[l]||LL[l]||c};
+function epeler(word){const out=[],ch=[...word];
+  for(let i=0;i<ch.length;i++){const c=ch[i];if(c===" "){out.push("espace");continue}
+    let n=nomLletra(c);if(c!==c.toLowerCase())n+=" majuscule";
+    if(ch[i+1]===c&&LL[c]){out.push("deux "+LL[c]);i++;continue}
+    out.push(n)}
+  return out}
+const visLletra=t=>t.replace(/^ku/,"qu");
 
 /* ---------- activities ---------- */
 const RUN={
@@ -222,13 +281,7 @@ const RUN={
     $("#hint").onclick=()=>setFeedback("Comença per: «"+target[0].slice(0,Math.ceil(target[0].length/3))+"…»","");
     let done=false;
     $("#wf").onsubmit=e=>{e.preventDefault();if(done)return;const v=inp.value.trim();if(!v)return;done=true;
-      const exact=target.some(t=>t.toLowerCase()===v.toLowerCase().replace(/’/g,"'"));
-      const close=!exact&&target.some(t=>norm(t)===norm(v));const noArt=!exact&&!close&&target.some(t=>snorm(t)===snorm(v));
-      mark(exact||close);say(spoken(it.fr));
-      if(exact)setFeedback("✔ Très bien ! "+it.fr,"ok");
-      else if(close)setFeedback("✔ Gairebé! Revisa els accents: "+it.fr,"ok");
-      else if(noArt)setFeedback("✘ Falta o sobra l'article: "+it.fr,"ko");
-      else setFeedback("✘ La resposta és: "+it.fr,"ko")};
+      const r=corregeix([...target,...(it.alt||[])],v);mark(r.ok);say(spoken(it.fr));setFeedbackHTML(r.html,r.cls)};
     wireNext(RUN.escriu)},
   parelles(){
     let titol="Uneix cada parella",pairs;
@@ -263,8 +316,8 @@ const RUN={
       <p class="feedback" id="fb"></p>`+nextBtn();
     answerOpts(ok=>{setFeedback((ok?"✔ Très bien ! ":"✘ Era: ")+it.fr+(it.art==="l'"?` (${it.g==="f"?"femení":"masculí"})`:""),ok?"ok":"ko");say(it.fr)});wireNext(RUN.article)},
   ordre(){
-    const all=items(),start=rnd(all.length),seq=[0,1,2,3].map(k=>all[(start+k)%all.length]);let pos=0,missed=false;const built=[];
-    stage().innerHTML=scoreBar()+`<p class="label">Toca en ordre, començant per ${esc(seq[0].ca)}</p>
+    const all=items(),start=T.circular===false?rnd(all.length-3):rnd(all.length),seq=[0,1,2,3].map(k=>all[(start+k)%all.length]);let pos=0,missed=false;const built=[];
+    stage().innerHTML=scoreBar()+`<p class="label">Toca en ordre, començant per ${esc(seq[0].fr)}</p>
       <p class="prompt small" id="built" style="min-height:2.2em">…</p>
       <div class="opts">${shuffle(seq).map(o=>`<button class="opt" data-k="${esc(o.fr)}">${esc(o.fr)}</button>`).join("")}</div>
       <p class="feedback" id="fb"></p>`+nextBtn();
@@ -303,10 +356,53 @@ const RUN={
     $("#hint").onclick=()=>setFeedback("Pot ser: "+f.o.join(" · "),"");
     let done=false;
     $("#wf").onsubmit=e=>{e.preventDefault();if(done)return;const v=inp.value.trim().replace(/’/g,"'");if(!v)return;done=true;
-      const exact=v.toLowerCase()===f.a.toLowerCase(),close=!exact&&norm(v)===norm(f.a);
-      mark(exact||close);$("#gap").textContent=f.a;say(f.fr);if(f.why)$("#why").textContent="💡 "+f.why;
-      setFeedback(exact?"✔ Très bien ! "+f.fr:close?"✔ Gairebé! Revisa els accents: "+f.a:"✘ Era: "+f.a+" — "+f.fr,exact||close?"ok":"ko")};
+      const r=corregeix(f.a,v);mark(r.ok);$("#gap").textContent=f.a;say(f.fr);if(f.why)$("#why").textContent="💡 "+f.why;
+      setFeedbackHTML(r.ok?r.html.replace(esc(f.a),esc(f.fr)):r.html+`<br>Frase: ${esc(f.fr)}`,r.cls)};
     wireNext(RUN.escriuB)},
+  dictat(){
+    const w=pickParaula(),sp=epeler(w);
+    stage().innerHTML=scoreBar()+`<p class="label">Escolta com es lletreja i escriu la paraula</p>
+      <div class="row" style="margin:12px 0 16px"><button class="speak big-speak" id="sp">${SPK}<span>Lletreja</span></button><button class="speak" id="slow">🐢 Lent</button></div>
+      <form id="wf" class="row" style="flex-direction:column"><label for="ans" class="label" style="margin:0">La paraula</label>
+        <input id="ans" class="answer" autocomplete="off" autocapitalize="off" spellcheck="false">${accentsHTML}
+        <div class="row" style="margin-top:10px"><button class="btn" type="submit">Comprova</button><button class="btn ghost" type="button" id="hint">Pista</button></div></form>
+      <p class="feedback" id="fb"></p><p class="why" id="why"></p>`+nextBtn();
+    const play=r=>say(sp.join(", "),r);$("#sp").onclick=()=>play(.8);$("#slow").onclick=()=>play(.55);play(.8);
+    const inp=$("#ans");wireAccents(inp);
+    $("#hint").onclick=()=>setFeedback(`Té ${[...w].filter(c=>/\p{L}/u.test(c)).length} lletres i comença per «${w[0]}»`,"");
+    let done=false;
+    $("#wf").onsubmit=e=>{e.preventDefault();if(done)return;const v=inp.value.trim();if(!v)return;done=true;
+      const ok=v.replace(/’/g,"'")===w,r=ok?{ok:true,html:"✔ Parfait ! "+esc(w),cls:"ok"}:corregeix(w,v);
+      if(!ok&&r.ok&&v.toLowerCase()===w.toLowerCase())r.html=`✔ Molt bé! Compte amb les majúscules: ${esc(w)}`;
+      mark(r.ok);setFeedbackHTML(r.html,r.cls);$("#why").textContent=sp.map(visLletra).join(" · ");say(w)};
+    wireNext(RUN.dictat)},
+  lletreja(){
+    const w=pickParaula(),sp=epeler(w);let done=false;
+    stage().innerHTML=scoreBar()+`<p class="label">Lletreja aquesta paraula en veu alta</p>
+      <p class="prompt">${esc(w)}</p>
+      <div class="row"><button class="btn" id="show">Comprova com es lletreja</button></div>
+      <p class="why" id="why" style="font-size:1.05rem"></p>
+      <div class="row" id="self" hidden style="margin-top:10px"><button class="btn ghost" id="s-ko">Ho he de repetir</button><button class="btn" id="s-ok">Ho he dit bé</button></div>
+      <p class="feedback" id="fb"></p>`+nextBtn();
+    $("#show").onclick=()=>{$("#why").textContent=sp.map(visLletra).join(" · ");$("#self").hidden=false;say(sp.join(", "),.8)};
+    $("#s-ok").onclick=()=>{if(done)return;done=true;mark(true);setFeedback("✔ Très bien !","ok")};
+    $("#s-ko").onclick=()=>{if(done)return;done=true;mark(false);setFeedback("Escolta-ho un altre cop i torna-ho a provar.","ko");say(sp.join(", "),.6)};
+    wireNext(RUN.lletreja)},
+  /* Decisions: the tema gives sets of phrases with a marked spot (_) and a few options.
+     Used for liaisons: is it obligatory or forbidden? which sound does it make? */
+  decisio(i){
+    const D=T.decisions[i],it=any(D.items),dir=`d${i}`;
+    const say_=it.s.replace(/-_|_-/g,"-").replace(/_/g," ");
+    const show=esc(it.s).replace(/_/,'<span class="junc" id="junc">?</span>');
+    stage().innerHTML=scoreBar(D.nom)+`<p class="label">${esc(D.instr)}</p>
+      <p class="sent" style="font-size:1.5rem">${show}</p>${it.ca?`<p class="cahint">${esc(it.ca)}</p>`:""}
+      <div class="opts">${D.opcions.map(([k,t])=>`<button class="opt" data-ok="${k===it.r}" style="font-size:1.15rem;font-weight:700">${esc(t)}</button>`).join("")}</div>
+      <p class="feedback" id="fb"></p><p class="why" id="why"></p>
+      <div class="row" style="margin-top:8px">${speakBtn(say_)}</div>`+nextBtn();
+    answerOpts(ok=>{const j=$("#junc");j.textContent=(D.marca&&D.marca[it.r])||it.r;j.classList.add(it.r==="p"?"no":"si");
+      const lab=(D.opcions.find(o=>o[0]===it.r)||[,""])[1];
+      setFeedback((ok?"✔ Très bien ! ":"✘ Era: ")+lab,ok?"ok":"ko");if(it.why)$("#why").textContent="💡 "+it.why;say(say_)});
+    wireNext(()=>RUN.decisio(i))},
   ordena(){
     let src=null;
     if(T.items&&(!(T.frases||T.genFrase)||rnd(2))){const c=items().filter(x=>toks(spoken(x.fr)).length>=3);if(c.length){const it=any(c);src={fr:spoken(it.fr),ca:it.ca}}}
@@ -331,7 +427,7 @@ const RUN={
     let it;
     if((T.parlaFrases||!T.items)&&(T.frases||T.genFrase)){const f=pickFrase();it={fr:f.fr,ca:f.ca}}else it=pickItem();
     const targets=it.fr.split(" / ").map(t=>t.replace(/ Joan$/,""));
-    const accept=[...targets,...it.fr.split(" / "),...(it.n!=null?[String(it.n)]:[]),...(it.abbr?[it.abbr]:[])];
+    const accept=[...targets,...it.fr.split(" / "),...(it.alt||[]),...(it.n!=null?[String(it.n)]:[]),...(it.abbr?[it.abbr]:[])];
     const canListen=SR&&!srBlocked;
     const shown=parlaMode==="llegeix"
       ?`<p class="label">Llegeix-ho en veu alta</p><p class="prompt ${it.fr.length>22?"small":""}">${esc(it.fr)}</p>`
@@ -388,7 +484,7 @@ function renderIndex(){
 function renderTema(){
   const A=actsOf(T);
   $("#app").innerHTML=`<div class="top"><a class="back" href="#" aria-label="Torna a l'índex">← Índex</a><h1>${esc(T.titol)}</h1></div>
-    <div class="in"><nav class="tabs" id="tabs" aria-label="Activitats">${A.map(a=>`<button aria-pressed="${a===act}" data-a="${a}">${ACTS[a]}</button>`).join("")}</nav>
+    <div class="in"><nav class="tabs" id="tabs" aria-label="Activitats">${A.map(a=>`<button aria-pressed="${a===act}" data-a="${a}">${actLabel(a)}</button>`).join("")}</nav>
     ${T.estances?`<div class="rooms" id="rooms">${Object.entries(T.estances).map(([k,v])=>`<button aria-pressed="${k===room}" data-r="${k}">${v}</button>`).join("")}</div>`:""}
     <section class="stage" id="stage" aria-live="polite"></section>
     ${T.consell?`<p class="tip">💡 ${esc(T.consell)}</p>`:""}</div>`;
@@ -396,7 +492,7 @@ function renderTema(){
   if(T.estances)$("#rooms").onclick=e=>{const b=e.target.closest("[data-r]");if(!b)return;room=b.dataset.r;score={ok:0,total:0};renderTema()};
   const cur=$("#tabs [aria-pressed=true]");if(cur)cur.scrollIntoView({block:"nearest",inline:"center"});
   clearTimeout(nextTimer);if(act!=="parla"&&micOn)stopMic();
-  RUN[act]();
+  const dm=/^d(\d+)$/.exec(act);dm?RUN.decisio(+dm[1]):RUN[act]();
 }
 function route(){
   const [id,a]=decodeURIComponent(location.hash.slice(1)).split(".");
@@ -411,6 +507,7 @@ function route(){
 function init(){
 TEMES.forEach(t=>{
   if(t.items)t.items=t.items.map(normItem);
+  if(t.items)t.items.forEach(x=>{if(x.diu)SAYMAP[x.fr]=x.diu});
   if(t.frases&&t.tipus!=="verbes")t.frases=t.frases.map(normFrase);
   if(t.tipus&&BUILD[t.tipus])BUILD[t.tipus](t);
   if(t.regla)t.regla=rich(t.regla);
